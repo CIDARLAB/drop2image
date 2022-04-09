@@ -2,13 +2,11 @@ import sys
 from PIL import Image
 from PIL import ImageColor
 import numpy as np
-import os
-import PIL
-import glob
 import cv2
 
 def resize_image(filename, size):
     # can i assume that the aspect ratio of input image file and user specified size are the same?
+    # ok
     im = Image.open(filename, 'r')
     r_im = im.resize(size)
     #r_im.save(filename)
@@ -17,6 +15,7 @@ def resize_image(filename, size):
 
 def get_closest_color(pix, color):
     # in what form color input will be given?
+    # hex, rgb, anything
     closest_color = None
     min_diff = sys.maxsize
     pix = np.array(pix)
@@ -59,13 +58,14 @@ def convert_jpeg_to_pix(filename):
 def output_format(filename, pix):
     txt = open(filename, 'a')
     np.savetxt(filename, pix, fmt='%d', delimiter=" ")
+    txt.close()
     return
 
 # example function
-image = resize_image('image.jpeg', (10,10))
+image = resize_image('image.jpeg', (10, 10))
 image.save('newest_image.jpeg')
 
-color_set = []
+color_set = ['#FFFFFF', '#000000'] # user input
 im_out = get_closest_image('image.jpeg', color_set)
 
 #im_out.save('closest_image.jpeg')
@@ -101,3 +101,12 @@ output_format('closest_resized_pix.txt', closest_resized_pix)
 #
 # np.savetxt("image_pix.txt", pix_list, fmt='%d', delimiter=" ")
 # txt.close()
+
+
+# indices of color set
+# emoji??
+# QR code 100*100?
+
+# output file to be index of color set
+# being order top left to bottom left
+
