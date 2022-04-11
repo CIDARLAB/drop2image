@@ -100,24 +100,24 @@ def output_format(filename, pix):
 
 
 # test with emoji
-resized_test = resize_image("test.png", (10,10))
+resized_test = resize_image("emoji_test/test.png", (10, 10))
 resized_test.save('resized_test.png')
 color_set = ['#FF0000', '#FFFFFF', '#000000']
-im_out = get_closest_image('resized_test.png', color_set)
-cv2.imwrite('closest_test.png', im_out)
+im_out = get_closest_image('emoji_test/resized_test.png', color_set)
+cv2.imwrite('emoji_test/closest_test.png', im_out)
 
-closest_resized_pix = convert_jpeg_to_pix('closest_test.png')
-output_format('test.txt', closest_resized_pix)
+closest_resized_pix = convert_jpeg_to_pix('emoji_test/closest_test.png')
+output_format('emoji_test/test.txt', closest_resized_pix)
 
 
-resized_odd = resize_image("test_odd.png", (15,15))
+resized_odd = resize_image("emoji_test/test_odd.png", (15, 15))
 resized_odd.save("resized_odd.png")
 color_set_odd = ['#FFFF00', '#FFFFFF', '#000000']
-im_out_odd = get_closest_image('resized_odd.png', color_set_odd)
-cv2.imwrite('closest_odd.png', im_out_odd)
+im_out_odd = get_closest_image('emoji_test/resized_odd.png', color_set_odd)
+cv2.imwrite('emoji_test/closest_odd.png', im_out_odd)
 
-closest_resized_odd_pix = convert_jpeg_to_pix('closest_odd.png')
-output_format('test_odd.txt', closest_resized_odd_pix)
+closest_resized_odd_pix = convert_jpeg_to_pix('emoji_test/closest_odd.png')
+output_format('emoji_test/test_odd.txt', closest_resized_odd_pix)
 
 # txt = open('image_pix.txt', 'a')
 #
