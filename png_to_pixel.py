@@ -51,29 +51,20 @@ def convert_jpeg_to_pix(filename):
     pix_list = []
     if w%2==0:
         for i in range(h):
-            if i%2==0:
-                for j in range(w):
+            for j in range(w):
+                if i%2==0:
                     pix = im.getpixel((j,i))
-                    pix_list.append(tuple(pix))
-            else:
-                for j in range(w):
+                else:
                     pix = im.getpixel((w-1-j,i))
-                    pix_list.append(tuple(pix))
+                pix_list.append(tuple(pix))
     else:
         for i in range(h):
-            if i%2==0:
-                for j in range(w):
+            for j in range(w):
+                if i%2==0:
                     pix = im.getpixel((w-1-j,i))
-                    pix_list.append(tuple(pix))
-            else:
-                for j in range(w):
+                else:
                     pix = im.getpixel((j,i))
-                    pix_list.append(tuple(pix))
-
-    # for i in range(w):
-    #     for j in range(h):
-    #         pix = image.getpixel((i,j))
-    #         pix_list.append(tuple(pix))
+                pix_list.append(tuple(pix))
 
     return pix_list
 
@@ -84,24 +75,21 @@ def output_format(filename, pix):
     return
 
 # example function
-# image = resize_image('image.jpeg', (10, 10))
-# image.save('newest_image.jpeg')
-#
-# color_set = ['#FFFFFF', '#000000', '#FFEB3B'] # user input
-# im_out = get_closest_image('image.jpeg', color_set)
-#
-# #im_out.save('closest_image.jpeg')
-# cv2.imwrite('closest_image.jpeg', im_out)
-#
-# im_resized_out = get_closest_image('newest_image.jpeg', color_set)
-# cv2.imwrite('closest_resized_image.jpeg', im_resized_out)
-# closest_resized_pix = convert_jpeg_to_pix('closest_resized_image.jpeg')
-# output_format('closest_resized_pix.txt', closest_resized_pix)
+image = resize_image('test_image/image.jpeg', (10, 10))
+image.save('test_image/newest_image.jpeg')
+color_set = ['#FFFFFF', '#000000'] # user input
+im_out = get_closest_image('test_image/image.jpeg', color_set)
+cv2.imwrite('test_image/closest_image.jpeg', im_out)
+
+im_resized_out = get_closest_image('test_image/newest_image.jpeg', color_set)
+cv2.imwrite('test_image/closest_resized_image.jpeg', im_resized_out)
+closest_resized_pix = convert_jpeg_to_pix('test_image/closest_resized_image.jpeg')
+output_format('test_image/closest_resized_pix.txt', closest_resized_pix)
 
 
-# test with emoji
+# test with emoji with even number of pixels
 resized_test = resize_image("emoji_test/test.png", (10, 10))
-resized_test.save('resized_test.png')
+resized_test.save('emoji_test/resized_test.png')
 color_set = ['#FF0000', '#FFFFFF', '#000000']
 im_out = get_closest_image('emoji_test/resized_test.png', color_set)
 cv2.imwrite('emoji_test/closest_test.png', im_out)
@@ -109,9 +97,9 @@ cv2.imwrite('emoji_test/closest_test.png', im_out)
 closest_resized_pix = convert_jpeg_to_pix('emoji_test/closest_test.png')
 output_format('emoji_test/test.txt', closest_resized_pix)
 
-
+# test with emoji with odd number of pixels
 resized_odd = resize_image("emoji_test/test_odd.png", (15, 15))
-resized_odd.save("resized_odd.png")
+resized_odd.save("emoji_test/resized_odd.png")
 color_set_odd = ['#FFFF00', '#FFFFFF', '#000000']
 im_out_odd = get_closest_image('emoji_test/resized_odd.png', color_set_odd)
 cv2.imwrite('emoji_test/closest_odd.png', im_out_odd)
@@ -119,30 +107,6 @@ cv2.imwrite('emoji_test/closest_odd.png', im_out_odd)
 closest_resized_odd_pix = convert_jpeg_to_pix('emoji_test/closest_odd.png')
 output_format('emoji_test/test_odd.txt', closest_resized_odd_pix)
 
-# txt = open('image_pix.txt', 'a')
-#
-# width, height = image.size
-# print(image.size)
-#
-# #pix = list(image.getdata())
-# #pix = [pix[i * width:(i + 1) * width] for i in range(height)]
-# #pix = np.array(pix).reshape((width, height))
-# #print(pix)
-# #image.save('new_image.jpeg')
-# #pix = image.load()
-#
-# image = image.convert('RGB')
-#
-# pix_list = []
-#
-# for i in range(image.width):
-#     for j in range(image.height):
-#         pix = image.getpixel((i, j))
-#         pix_list.append(tuple(pix))
-#         #print(pix)
-#
-# np.savetxt("image_pix.txt", pix_list, fmt='%d', delimiter=" ")
-# txt.close()
 
 
 # indices of color set
@@ -150,5 +114,5 @@ output_format('emoji_test/test_odd.txt', closest_resized_odd_pix)
 # QR code 100*100?
 
 # output file to be index of color set
-# being order top left to bottom left
+# being order top left to bottom left -> done
 
