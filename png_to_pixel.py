@@ -76,17 +76,17 @@ def output_format(filename, pix):
     txt.close()
     return
 
-# example function
-image = resize_image('test_image/image.jpeg', (10, 10))
-image.save('test_image/newest_image.jpeg')
-color_set = ['#FFFFFF', '#000000'] # user input
-im_out = get_closest_image('test_image/image.jpeg', color_set)
-cv2.imwrite('test_image/closest_image.jpeg', im_out)
-
-im_resized_out = get_closest_image('test_image/newest_image.jpeg', color_set)
-cv2.imwrite('test_image/closest_resized_image.jpeg', im_resized_out)
-closest_resized_pix = convert_jpeg_to_pix('test_image/closest_resized_image.jpeg', color_set)
-output_format('test_image/closest_resized_pix.txt', closest_resized_pix)
+# # example function
+# image = resize_image('test_image/image.jpeg', (10, 10))
+# image.save('test_image/newest_image.jpeg')
+# color_set = ['#FFFFFF', '#000000'] # user input
+# im_out = get_closest_image('test_image/image.jpeg', color_set)
+# cv2.imwrite('test_image/closest_image.jpeg', im_out)
+#
+# im_resized_out = get_closest_image('test_image/newest_image.jpeg', color_set)
+# cv2.imwrite('test_image/closest_resized_image.jpeg', im_resized_out)
+# closest_resized_pix = convert_jpeg_to_pix('test_image/closest_resized_image.jpeg', color_set)
+# output_format('test_image/closest_resized_pix.txt', closest_resized_pix)
 
 
 # test with emoji with even number of pixels
