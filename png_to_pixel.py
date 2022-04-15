@@ -49,7 +49,6 @@ def convert_jpeg_to_pix(filename, color_set):
     w, h = im.size
     im = im.convert('RGB')
     color_set_rgb = [ImageColor.getrgb(color) for color in color_set]
-    print(color_set_rgb)
     pix_list = []
     if w%2==0:
         for i in range(h):
@@ -109,6 +108,14 @@ cv2.imwrite('emoji_test/closest_odd.png', im_out_odd)
 closest_resized_odd_pix = convert_jpeg_to_pix('emoji_test/closest_odd.png', color_set_odd)
 output_format('emoji_test/test_odd.txt', closest_resized_odd_pix)
 
+# test for presentation
+resized_emoji = resize_image("emoji_test/emoji.png", (50, 50))
+resized_emoji.save("emoji_test/resized_emoji.png")
+color_set = ['#FFFF00', '#FFFFFF', '#000000']
+im_out_emoji = get_closest_image('emoji_test/resized_emoji.png', color_set)
+cv2.imwrite("emoji_test/closest_emoji.png", im_out_emoji)
+closest_resized_emoji_pix = convert_jpeg_to_pix("emoji_test/closest_emoji.png", color_set)
+output_format("emoji_test/emoji.txt", closest_resized_emoji_pix)
 
 
 # QR code 100*100?
