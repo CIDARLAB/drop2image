@@ -9,57 +9,13 @@ import cv2
 import serial
 import time
 
-#
-# original_filename = ""
-#
-# def open_img():
-#     # Select the Imagename  from a folder
-#     original_filename = openfilename()
-#     x = original_filename
-#
-#     # open the image and display
-#     img = Image.open(x)
-#     img = img.resize((250, 250), Image.Resampling.LANCZOS)
-#
-#     # PhotoImage class is used to add image to widgets, icons etc
-#     img = ImageTk.PhotoImage(img)
-#
-#     # create a label
-#     panel = Label(root, image = img)
-#
-#     # set the image as img
-#     panel.image = img
-#     panel.grid(row = 2)
-#
-#
-# def openfilename():
-#     filename = filedialog.askopenfilename(title = "original")
-#     return filename
-#
-# def transformation():
-#     x = resize_image(original_filename, 100)
-#
-# def resize_image(filename, size):
-#     # can i assume that the aspect ratio of input image file and user specified size are the same?
-#     # ok
-#     im = Image.open(filename)
-#     r_im = im.resize(size)
-#     r_im.save('resized_image')
-#     return r_im
-#
-#
-# root = Tk()
-# root.title("Image Loader")
-# root.geometry("550x300")
-# root.resizable(width = True, height = True)
-# main_btn = Button(root, text = 'open image', command= open_img).grid(row = 1, columnspan = 4)
-# run_btn = Button(root, text = 'run', command = transformation).grid(row = 3, columnspan = 5)
-# root.mainloop()
 
 class GUI:
     def __init__(self):
         self.filename = None
+        self.filename_closest = None
         self.src = None
+        self.src_cv2 = None
         self.root = Tk()
         self.image_size = (10,10) #default 10x10
         self.pix_list = []
@@ -85,7 +41,7 @@ class GUI:
 
         set_size_btn = Button(self.root, text = 'OK', command=lambda: self.set_size(width, height, color)).grid(row = 6)
 
-        run_btn = Button(self.root, text = 'run', command = lambda: self.transformation(self.image_size)).grid(row = 8)
+        run_btn = Button(self.root, text = 'run', command = lambda: self.transformation(self.image_size)).grid(row = 9)
 
         #send_btn = Button(self.root, text = 'send to Arduino', command = lambda: self.send_to_Arduino()).grid(row = 6, columnspan = 8)
         self.root.mainloop()
@@ -122,6 +78,13 @@ class GUI:
         panel = Label(self.root, image = resized_img)
         panel.image = resized_img
         panel.grid(row = 7)
+        cv2_closest_resized_img = self.get_closest_image(self.src_cv2, self.color_set)
+        closest_resized_img = Image.open(self.filename_closest)
+        closest_resized_img = closest_resized_img.resize((250, 250), Image.Resampling.LANCZOS)
+        closest_resized_img = ImageTk.PhotoImage(image = closest_resized_img)
+        panel2 = Label(self.root, image = closest_resized_img)
+        panel2.image = closest_resized_img
+        panel2.grid(row = 8)
 
 
 
@@ -134,6 +97,7 @@ class GUI:
         file = self.filename.split('.')
         filename = file[0] + '_resized.png'
         r_im.save(filename)
+        self.src_cv2 = cv2.imread(filename)
         return r_im
 
     def set_size(self, w, h, c):
@@ -157,8 +121,8 @@ class GUI:
                 closest_color = clr
         return closest_color
 
-    def get_closest_image(self, filename, color_set):
-        im = cv2.imread(filename)
+    def get_closest_image(self, im, color_set):
+        #im = cv2.imread(filename)
         color_set_rgb = [ImageColor.getrgb(color) for color in color_set]
         h, w, c = im.shape
         im_out = np.zeros((h,w,c))
@@ -169,6 +133,10 @@ class GUI:
                 c_r, c_g, c_b = self.get_closest_color((r,g,b), color_set_rgb)
                 im_out[i,j,:] = (c_b, c_g, c_r)
                 # fixing the order of rgb
+
+        file = self.filename.split('.')
+        self.filename_closest = file[0] + '_closest.png'
+        cv2.imwrite(self.filename_closest, im_out)
         return im_out
 
     def convert_jpeg_to_pix(self, filename, color_set):
