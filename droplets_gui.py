@@ -151,7 +151,6 @@ class GUI:
             line = f.readline()
             if line:
                 ser.write(line.encode('utf-8'))
-                print(line, type(line))
                 time.sleep(1)
             else:
                 ser.close()
