@@ -6,14 +6,18 @@ from tkinter import filedialog
 from tkinter import ttk
 import numpy as np
 import cv2
+import socket
 import serial
+from serial.tools import list_ports
 import time
+from contextlib import closing
 
 
 class GUI:
     def __init__(self):
         self.filename = None
         self.filename_closest = None
+        self.filename_txt = None
         self.src = None
         self.src_cv2 = None
         self.root = Tk()
@@ -22,7 +26,7 @@ class GUI:
         self.color_set = ['#FFFFFF', '#000000'] #default Black and White
 
         self.root.title("Image Loader")
-        self.root.geometry("550x300")
+        self.root.geometry("500x1000")
         self.root.resizable(width = True, height = True)
 
         main_btn = Button(self.root, text = 'open image', command=lambda: self.open_img()).grid(row = 1)
@@ -41,9 +45,10 @@ class GUI:
 
         set_size_btn = Button(self.root, text = 'OK', command=lambda: self.set_size(width, height, color)).grid(row = 6)
 
-        run_btn = Button(self.root, text = 'run', command = lambda: self.transformation(self.image_size)).grid(row = 9)
+        run_btn = Button(self.root, text = 'run', command = lambda: self.transformation(self.image_size, color)).grid(row = 9)
 
-        #send_btn = Button(self.root, text = 'send to Arduino', command = lambda: self.send_to_Arduino()).grid(row = 6, columnspan = 8)
+        #send_btn = Button(self.root, text = 'send to Arduino', command = lambda: self.TCP()).grid(row = 10)
+        send_btn = Button(self.root, text = 'send to Arduino', command = lambda: self.Serial_Com()).grid(row = 10)
         self.root.mainloop()
 
 
@@ -71,7 +76,7 @@ class GUI:
         filename = filedialog.askopenfilename(title = "original")
         return filename
 
-    def transformation(self, size):
+    def transformation(self, size, color_set):
         resized_img = self.resize_image(size)
         resized_img = resized_img.resize((250, 250), Image.Resampling.LANCZOS) # so that user can see (super blurred)
         resized_img = ImageTk.PhotoImage(resized_img)
@@ -85,8 +90,8 @@ class GUI:
         panel2 = Label(self.root, image = closest_resized_img)
         panel2.image = closest_resized_img
         panel2.grid(row = 8)
-
-
+        self.convert_jpeg_to_pix(self.filename_closest, self.color_set)
+        self.output_format(self.pix_list)
 
     def resize_image(self, size):
         if self.src is None:
@@ -105,9 +110,54 @@ class GUI:
         if (len(c.get()) != 0):
             self.color_set = (c.get()).split(', ')
 
-    def send_to_Arduino(self):
-        print('Open Port')
-        ser = serial.Serial("PortName", 9600)
+    def TCP(self):
+        # using TCP communication
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        sock.bind("IP Address of Arduino", 8080)
+        sock.listen(1)
+
+        print("waiting for socket connection")
+        (clientsocket, address) = sock.accept()
+        print("Established a socket connection from %s on port %s" % (address))
+        s = clientsocket
+        s.settimeout(0.5)
+
+        f = open(self.filename_txt, 'r', encoding='utf_8')
+
+        with closing(sock):
+            while True:
+                line = f.readline()
+                if line:
+                    try:
+                        sock.send(line)
+                        try:
+                            rcv_data = sock.recv(1, socket.MSG_DONTWAIT)
+                            print(rcv_data)
+                        except socket.timeout as e:
+                            pass
+                        time.sleep(1)
+                    except:
+                        sock.close()
+                else:
+                    break;
+
+    def Serial_Com(self):
+        dev = [info.device for info in list_ports.comports()]
+        print(dev)
+        ser = serial.Serial(dev[2], 9600)
+        f = open(self.filename_txt, 'r', encoding='utf_8')
+        while True:
+            line = f.readline()
+            if line:
+                ser.write(line.encode('utf-8'))
+                print(line, type(line))
+                time.sleep(1)
+            else:
+                ser.close()
+                break
+        f.close()
+
 
     def get_closest_color(self, pix, color):
         closest_color = None
@@ -161,6 +211,13 @@ class GUI:
                         pix = color_set_rgb.index(im.getpixel((j,i)))
                     self.pix_list.append((pix))
 
+    def output_format(self, pix):
+        file = self.filename.split('.')
+        self.filename_txt = file[0] + '_pix.txt'
+        txt = open(self.filename_txt, 'a')
+        np.savetxt(self.filename_txt, pix, fmt='%d', delimiter=" ")
+        txt.close()
+        return
 
 
 
