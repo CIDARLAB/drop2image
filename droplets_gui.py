@@ -20,6 +20,7 @@ class GUI:
         self.filename_txt = None
         self.src = None
         self.src_cv2 = None
+        self.port = None
         self.root = Tk()
         self.image_size = (10,10) #default 10x10
         self.pix_list = []
@@ -47,8 +48,12 @@ class GUI:
 
         run_btn = Button(self.root, text = 'run', command = lambda: self.transformation(self.image_size, color)).grid(row = 9)
 
+        dev = [info.device for info in list_ports.comports()]
+        self.port = StringVar()
+        select_box = ttk.Combobox(self.root, textvariable=self.port, values=dev, style='office.TCombobox').grid(row = 10)
+
         #send_btn = Button(self.root, text = 'send to Arduino', command = lambda: self.TCP()).grid(row = 10)
-        send_btn = Button(self.root, text = 'send to Arduino', command = lambda: self.Serial_Com()).grid(row = 10)
+        send_btn = Button(self.root, text = 'send to Arduino', command = lambda: self.Serial_Com()).grid(row = 11)
         self.root.mainloop()
 
 
@@ -140,12 +145,10 @@ class GUI:
                     except:
                         sock.close()
                 else:
-                    break;
+                    break
 
     def Serial_Com(self):
-        dev = [info.device for info in list_ports.comports()]
-        print(dev)
-        ser = serial.Serial(dev[2], 9600)
+        ser = serial.Serial(self.port.get(), 9600)
         f = open(self.filename_txt, 'r', encoding='utf_8')
         while True:
             line = f.readline()
@@ -221,3 +224,6 @@ class GUI:
 
 
 test = GUI()
+
+#need to implement menu tab
+#need to implement select menu for serial port -> done

@@ -8,6 +8,6 @@ void setup(){
 
 void loop(){
     pix[cnt] = Serial.read();
-    delay(1000);
+    delay(500);
     cnt = cnt + 1;
 }
