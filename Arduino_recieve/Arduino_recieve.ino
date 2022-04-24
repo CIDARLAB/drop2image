@@ -5,7 +5,9 @@ void setup() {
     Bridge.begin();
     Serial.begin(9600);
     while (!Serial);
+    Serial.println("Yay");
     runCurl();
+    Serial.println("Done");
 }
 
 void loop() {
@@ -15,7 +17,7 @@ void loop() {
 void runCurl() {
     Process p;
     p.begin("curl");
-    p.addParameter("http://192.168.1.136:8000/pix.txt"); // this need to be changed to "http:// your IP of PC:8000/pix.txt
+    p.addParameter("http://192.168.1.136:8888/pix.txt"); // this need to be changed to "http:// your IP of PC:8000/pix.txt
     p.run();
     int cnt = 0;
     while (p.available()>0) {

@@ -8,7 +8,17 @@ from tkinter import ttk
 import numpy as np
 import cv2
 import os
+import time
+import http.server
+import threading
+from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 
+class MyServer(threading.Thread):
+    def run(self):
+        self.server = ThreadingHTTPServer(('192.168.1.136', 8888), SimpleHTTPRequestHandler)
+        self.server.serve_forever()
+    def stop(self):
+        self.server.shutdown()
 
 class GUI:
     def __init__(self):
@@ -119,8 +129,13 @@ class GUI:
 
     def send_to_Arduino(self):
         os.chdir(self.directory)
-        os.system("pwd")
-        os.system("python3 -m http.server")
+        server_address = ('', 8080)
+        s = MyServer()
+        s.start()
+        print('thread alive:', s.is_alive())  # True
+        time.sleep(15)
+        s.stop()
+        print('thread alive:', s.is_alive())  # False
 
     def get_closest_color(self, pix, color):
         closest_color = None
@@ -157,6 +172,7 @@ class GUI:
         w, h = im.size
         im = im.convert('RGB')
         color_set_rgb = [ImageColor.getrgb(color) for color in color_set]
+        self.pix_list.clear()
         if w%2==0:
             for i in range(h):
                 for j in range(w):
@@ -184,6 +200,7 @@ class GUI:
                 path += dr + '/'
         self.directory = path
         self.filename_txt = self.directory + 'pix.txt'
+        txt = open(self.filename_txt, 'w').close()
         txt = open(self.filename_txt, 'a')
         np.savetxt(self.filename_txt, pix, fmt='%d', delimiter=" ")
         txt.close()
