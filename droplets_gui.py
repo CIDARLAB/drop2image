@@ -1,3 +1,4 @@
+import string
 from tkinter import *
 from PIL import Image
 from PIL import ImageTk
@@ -6,16 +7,13 @@ from tkinter import filedialog
 from tkinter import ttk
 import numpy as np
 import cv2
-import socket
-import serial
-from serial.tools import list_ports
-import time
-from contextlib import closing
+import os
 
 
 class GUI:
     def __init__(self):
         self.filename = None
+        self.directory = None
         self.filename_closest = None
         self.filename_txt = None
         self.src = None
@@ -50,13 +48,14 @@ class GUI:
 
         run_btn = Button(self.root, text = 'run', command = lambda: self.transformation(self.image_size, color)).grid(row = 9)
 
-        dev = [info.device for info in list_ports.comports()]
-        self.port = StringVar()
-        select_box = ttk.Combobox(self.root, textvariable=self.port, values=dev, style='office.TCombobox').grid(row = 10)
+        # dev = [info.device for info in list_ports.comports()]
+        # self.port = StringVar()
+        # select_box = ttk.Combobox(self.root, textvariable=self.port, values=dev, style='office.TCombobox').grid(row = 10)
 
         #send_btn = Button(self.root, text = 'send to Arduino', command = lambda: self.TCP()).grid(row = 11)
-        send_btn = Button(self.root, text = 'send to Arduino', command = lambda: self.Serial_Com()).grid(row = 11)
+        #send_btn = Button(self.root, text = 'send to Arduino', command = lambda: self.Serial_Com()).grid(row = 11)
         #send_btn = Button(self.root, text = 'send to Arduino', command = lambda: self.Bridge_Com()).grid(row = 11)
+        send_btn = Button(self.root, text = 'send to Arduino', command = lambda: self.send_to_Arduino()).grid(row = 10)
         self.root.mainloop()
 
 
@@ -118,72 +117,10 @@ class GUI:
         if (len(c.get()) != 0):
             self.color_set = (c.get()).split(', ')
 
-    def TCP(self):
-        # using TCP communication
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        sock.bind(("192.168.1.136", 8080))
-        sock.listen(1)
-
-        print("waiting for socket connection")
-        (clientsocket, address) = sock.accept()
-        print("Established a socket connection from %s on port %s" % (address))
-        s = clientsocket
-        s.settimeout(0.5)
-
-        f = open(self.filename_txt, 'r', encoding='utf_8')
-
-        with closing(sock):
-            while True:
-                line = f.readline()
-                if line:
-                    try:
-                        sock.send(line)
-                        try:
-                            rcv_data = sock.recv(1, socket.MSG_DONTWAIT)
-                            print(rcv_data)
-                        except socket.timeout as e:
-                            pass
-                        time.sleep(1)
-                    except:
-                        sock.close()
-                else:
-                    break
-
-    def Serial_Com(self):
-        ser = serial.Serial(self.port.get(), 9600)
-        f = open(self.filename_txt, 'r', encoding='utf_8')
-        while True:
-            line = f.readline()
-            if line:
-                ser.write(line.encode('utf-8'))
-                time.sleep(1)
-            else:
-                ser.close()
-                break
-        f.close()
-
-    def Bridge_Com(self):
-        # f = open(self.filename_txt, 'r', encoding='utf_8')
-        # while True:
-        #     line = f.readline()
-        #     print(line)
-        #     if line:
-        #         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        #             s.connect((self.host, self.bind_port))
-        #             s.send(line)
-        #             data = s.recv(1024)
-        #         print(data)
-        #         time.sleep(0.1)
-        #     else:
-        #         break;
-        # f.close()
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-            s.connect((self.host, self.bind_port))
-            s.send(b"Hey")
-            data = s.recv(1024)
-            s.close()
-            print("recived data: ", data.decode('utf-8'))
+    def send_to_Arduino(self):
+        os.chdir(self.directory)
+        os.system("pwd")
+        os.system("python3 -m http.server")
 
     def get_closest_color(self, pix, color):
         closest_color = None
@@ -238,8 +175,15 @@ class GUI:
                     self.pix_list.append((pix))
 
     def output_format(self, pix):
-        file = self.filename.split('.')
-        self.filename_txt = file[0] + '_pix.txt'
+        file = self.filename.split('/')
+        path = ''
+        for dr in file:
+            if '.' in dr:
+                continue
+            else:
+                path += dr + '/'
+        self.directory = path
+        self.filename_txt = self.directory + 'pix.txt'
         txt = open(self.filename_txt, 'a')
         np.savetxt(self.filename_txt, pix, fmt='%d', delimiter=" ")
         txt.close()
@@ -251,4 +195,3 @@ test = GUI()
 
 #need to implement menu tab
 #need to implement select menu for serial port -> done
-# Arduino Yun as server
