@@ -11,3 +11,9 @@ void loop(){
     delay(500);
     cnt = cnt + 1;
 }
+
+// send the entire array
+// need serial monitor open
+// write to SD on Arduino
+// ethernet でもオッケー
+// need to be able to reset and start from the top

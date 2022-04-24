@@ -25,6 +25,8 @@ class GUI:
         self.image_size = (10,10) #default 10x10
         self.pix_list = []
         self.color_set = ['#FFFFFF', '#000000'] #default Black and White
+        self.host = '192.168.1.118'
+        self.bind_port = 5555
 
         self.root.title("Image Loader")
         self.root.geometry("500x1000")
@@ -52,8 +54,9 @@ class GUI:
         self.port = StringVar()
         select_box = ttk.Combobox(self.root, textvariable=self.port, values=dev, style='office.TCombobox').grid(row = 10)
 
-        #send_btn = Button(self.root, text = 'send to Arduino', command = lambda: self.TCP()).grid(row = 10)
+        #send_btn = Button(self.root, text = 'send to Arduino', command = lambda: self.TCP()).grid(row = 11)
         send_btn = Button(self.root, text = 'send to Arduino', command = lambda: self.Serial_Com()).grid(row = 11)
+        #send_btn = Button(self.root, text = 'send to Arduino', command = lambda: self.Bridge_Com()).grid(row = 11)
         self.root.mainloop()
 
 
@@ -119,7 +122,7 @@ class GUI:
         # using TCP communication
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        sock.bind("IP Address of Arduino", 8080)
+        sock.bind(("192.168.1.136", 8080))
         sock.listen(1)
 
         print("waiting for socket connection")
@@ -160,6 +163,27 @@ class GUI:
                 break
         f.close()
 
+    def Bridge_Com(self):
+        # f = open(self.filename_txt, 'r', encoding='utf_8')
+        # while True:
+        #     line = f.readline()
+        #     print(line)
+        #     if line:
+        #         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        #             s.connect((self.host, self.bind_port))
+        #             s.send(line)
+        #             data = s.recv(1024)
+        #         print(data)
+        #         time.sleep(0.1)
+        #     else:
+        #         break;
+        # f.close()
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.connect((self.host, self.bind_port))
+            s.send(b"Hey")
+            data = s.recv(1024)
+            s.close()
+            print("recived data: ", data.decode('utf-8'))
 
     def get_closest_color(self, pix, color):
         closest_color = None
@@ -227,3 +251,4 @@ test = GUI()
 
 #need to implement menu tab
 #need to implement select menu for serial port -> done
+# Arduino Yun as server
