@@ -15,7 +15,7 @@ from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 
 class MyServer(threading.Thread):
     def run(self):
-        self.server = ThreadingHTTPServer(('192.168.1.136', 8888), SimpleHTTPRequestHandler)
+        self.server = ThreadingHTTPServer(('10.192.13.179', 8888), SimpleHTTPRequestHandler)
         self.server.serve_forever()
     def stop(self):
         self.server.shutdown()
@@ -33,8 +33,6 @@ class GUI:
         self.image_size = (10,10) #default 10x10
         self.pix_list = []
         self.color_set = ['#FFFFFF', '#000000'] #default Black and White
-        self.host = '192.168.1.118'
-        self.bind_port = 5555
 
         self.root.title("Image Loader")
         self.root.geometry("500x1000")
@@ -133,7 +131,7 @@ class GUI:
         s = MyServer()
         s.start()
         print('thread alive:', s.is_alive())  # True
-        time.sleep(15)
+        time.sleep(30)
         s.stop()
         print('thread alive:', s.is_alive())  # False
 
@@ -212,3 +210,9 @@ test = GUI()
 
 #need to implement menu tab
 #need to implement select menu for serial port -> done
+
+
+# README first -> instructions
+# repo name: drop to image
+
+# add title, background, centered
