@@ -216,3 +216,4 @@ test = GUI()
 # repo name: drop to image
 
 # add title, background, centered
+# making small changes to make sure mirror worked
