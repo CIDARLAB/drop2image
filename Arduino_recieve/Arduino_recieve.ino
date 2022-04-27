@@ -1,5 +1,5 @@
 #include <Process.h>
-int pix[110];
+int pix[100];
 
 void setup() {
     Bridge.begin();
