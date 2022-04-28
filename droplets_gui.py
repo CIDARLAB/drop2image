@@ -101,14 +101,14 @@ class GUI:
         resized_img = ImageTk.PhotoImage(resized_img)
         panel = Label(self.root, image = resized_img)
         panel.image = resized_img
-        panel.grid(row = 7)
+        panel.grid(row = 7, column = 0)
         cv2_closest_resized_img = self.get_closest_image(self.src_cv2, self.color_set)
         closest_resized_img = Image.open(self.filename_closest)
         closest_resized_img = closest_resized_img.resize((250, 250), Image.Resampling.LANCZOS)
         closest_resized_img = ImageTk.PhotoImage(image = closest_resized_img)
         panel2 = Label(self.root, image = closest_resized_img)
         panel2.image = closest_resized_img
-        panel2.grid(row = 8)
+        panel2.grid(row = 7, column = 1)
         self.convert_jpeg_to_pix(self.filename_closest, self.color_set)
         self.output_format(self.pix_list)
 
