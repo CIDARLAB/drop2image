@@ -14,14 +14,18 @@ import threading
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 
 class MyServer(threading.Thread):
+    def __init__(self, IP_ADDR):
+        threading.Thread.__init__(self)
+        self.ip_addr = IP_ADDR
     def run(self):
-        self.server = ThreadingHTTPServer(('10.192.13.179', 8888), SimpleHTTPRequestHandler)
+        self.server = ThreadingHTTPServer((self.ip_addr, 8888), SimpleHTTPRequestHandler)
         self.server.serve_forever()
     def stop(self):
         self.server.shutdown()
 
 class GUI:
-    def __init__(self):
+    def __init__(self, IP_ADDR):
+        self.ip_addr = IP_ADDR
         self.filename = None
         self.directory = None
         self.filename_closest = None
@@ -128,7 +132,7 @@ class GUI:
     def send_to_Arduino(self):
         os.chdir(self.directory)
         server_address = ('', 8080)
-        s = MyServer()
+        s = MyServer(self.ip_addr)
         s.start()
         print('thread alive:', s.is_alive())  # True
         time.sleep(30)
@@ -205,8 +209,11 @@ class GUI:
         return
 
 
+def main(IP_ADDR):
+    test = GUI(IP_ADDR)
 
-test = GUI()
+if __name__ == '__main__':
+    main(sys.argv[1] if len(sys.argv) > 1 else "")
 
 #need to implement menu tab
 #need to implement select menu for serial port -> done

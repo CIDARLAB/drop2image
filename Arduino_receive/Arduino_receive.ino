@@ -1,5 +1,5 @@
 #include <Process.h>
-int pix[100];
+int pix[100]; // this need to be changed depending on how big the resized image is
 
 void setup() {
     Bridge.begin();
@@ -15,7 +15,7 @@ void loop() {
 void runCurl() {
     Process p;
     p.begin("curl");
-    p.addParameter("http://10.192.13.179:8888/pix.txt"); // this need to be changed to "http:// your IP of PC:8888/pix.txt
+    p.addParameter("http://YourIPAddress:8888/pix.txt"); // this need to be changed to "http:// your IP of PC:8888/pix.txt
     p.run();
     int cnt = 0;
     while (p.available()>0) {
