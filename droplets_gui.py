@@ -1,3 +1,5 @@
+import string
+import tkinter
 from tkinter import *
 from PIL import Image
 from PIL import ImageTk
@@ -6,16 +8,30 @@ from tkinter import filedialog
 from tkinter import ttk
 import numpy as np
 import cv2
+import os
+import time
+import http.server
+import threading
+from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 import socket
 import serial
 from serial.tools import list_ports
-import time
-from contextlib import closing
 
+class MyServer(threading.Thread):
+    def __init__(self, IP_ADDR):
+        threading.Thread.__init__(self)
+        self.ip_addr = IP_ADDR
+    def run(self):
+        self.server = ThreadingHTTPServer((self.ip_addr, 8888), SimpleHTTPRequestHandler)
+        self.server.serve_forever()
+    def stop(self):
+        self.server.shutdown()
 
 class GUI:
     def __init__(self):
+        self.ip_addr = socket.gethostbyname(socket.gethostname())
         self.filename = None
+        self.directory = None
         self.filename_closest = None
         self.filename_txt = None
         self.src = None
@@ -27,33 +43,54 @@ class GUI:
         self.color_set = ['#FFFFFF', '#000000'] #default Black and White
 
         self.root.title("Image Loader")
-        self.root.geometry("500x1000")
+        self.root.geometry("750x1000")
         self.root.resizable(width = True, height = True)
+        self.root.configure(bg='white')
 
         main_btn = Button(self.root, text = 'open image', command=lambda: self.open_img()).grid(row = 1)
+        #main_btn = Button(self.root, text = 'open image', command=lambda: self.open_img()).place(x = 0, y =250)
 
         frame_size = ttk.Frame(self.root, padding = (32)).grid()
         label_width = ttk.Label(frame_size, text = 'width', padding = (5,2)).grid(row = 3, column = 0, sticky =  E)
+        #label_width = ttk.Label(frame_size, text = 'width', padding = (5,2), width = 8).place(x = 0, y = 275)
         label_height = ttk.Label(frame_size, text = 'height', padding = (5,2)).grid(row = 4, column = 0, sticky = E)
+        #label_height = ttk.Label(frame_size, text = 'height', padding = (5,2), width = 8).place(x = 0, y = 300)
         label_color = ttk.Label(frame_size, text = 'color set', padding = (5,2)).grid(row = 5, column = 0, sticky = E)
+        #label_color = ttk.Label(frame_size, text = 'color set', padding = (5,2), width = 8).place(x = 0, y = 325)
 
         width = StringVar()
         width_entry = ttk.Entry(frame_size, textvariable=width, width=10).grid(row = 3, column = 1)
+        #width_entry = ttk.Entry(frame_size, textvariable=width, width=10).place(x = 80, y = 275)
         height = StringVar()
         height_entry = ttk.Entry(frame_size, textvariable=height, width=10).grid(row = 4, column = 1)
+        #height_entry = ttk.Entry(frame_size, textvariable=height, width=10).place(x = 80, y = 300)
         color = StringVar()
         color_entry = ttk.Entry(frame_size, textvariable=color, width=10).grid(row = 5, column = 1)
+        #color_entry = ttk.Entry(frame_size, textvariable=color, width=10).place(x = 80, y = 325)
 
         set_size_btn = Button(self.root, text = 'OK', command=lambda: self.set_size(width, height, color)).grid(row = 6)
+        #set_size_btn = Button(self.root, text = 'OK', command=lambda: self.set_size(width, height, color)).place(x = 200, y = 300)
 
-        run_btn = Button(self.root, text = 'run', command = lambda: self.transformation(self.image_size, color)).grid(row = 9)
+        run_btn = Button(self.root, text = 'run', command = lambda: self.transformation(self.image_size, color)).grid(row = 8)
+        #run_btn = Button(self.root, text = 'run', command = lambda: self.transformation(self.image_size, color)).place(x = 200, y = 325)
 
         dev = [info.device for info in list_ports.comports()]
         self.port = StringVar()
-        select_box = ttk.Combobox(self.root, textvariable=self.port, values=dev, style='office.TCombobox').grid(row = 10)
+        select_box = ttk.Combobox(self.root, textvariable=self.port, values=dev, style='office.TCombobox').grid(row = 9)
 
-        #send_btn = Button(self.root, text = 'send to Arduino', command = lambda: self.TCP()).grid(row = 10)
-        send_btn = Button(self.root, text = 'send to Arduino', command = lambda: self.Serial_Com()).grid(row = 11)
+        send_btn = Button(self.root, text = 'send to Arduino', command = lambda: self.Serial_Com()).grid(row = 10)
+
+        # send_btn = Button(self.root, text = 'send to Arduino', command = lambda: self.send_to_Arduino()).grid(row = 10)
+        # send_btn = Button(self.root, text = 'send to Arduino', command = lambda: self.send_to_Arduino()).place(x = 0, y = 605)
+
+        frame = ttk.Frame(self.root).grid()
+        ip_txt = ttk.Entry(frame, width = 30)
+        ip_txt.insert(END, "http://" + self.ip_addr + ":8888/pix.txt")
+        #ip_txt.place(x = 0, y = 630)
+        ip_txt.grid(row = 11)
+
+        # disp_btn = Button(self.root, text="display IP address", command=lambda: self.dispaly_ip()).place(x = 0, y = 620)
+
         self.root.mainloop()
 
 
@@ -75,7 +112,7 @@ class GUI:
 
         # set the image as img
         panel.image = img
-        panel.grid(row = 2)
+        panel.grid(row = 1)
 
     def openfilename(self):
         filename = filedialog.askopenfilename(title = "original")
@@ -87,14 +124,16 @@ class GUI:
         resized_img = ImageTk.PhotoImage(resized_img)
         panel = Label(self.root, image = resized_img)
         panel.image = resized_img
-        panel.grid(row = 7)
+        panel.grid(row = 7, column = 0)
+        # panel.place(x = 0, y = 350)
         cv2_closest_resized_img = self.get_closest_image(self.src_cv2, self.color_set)
         closest_resized_img = Image.open(self.filename_closest)
         closest_resized_img = closest_resized_img.resize((250, 250), Image.Resampling.LANCZOS)
         closest_resized_img = ImageTk.PhotoImage(image = closest_resized_img)
         panel2 = Label(self.root, image = closest_resized_img)
         panel2.image = closest_resized_img
-        panel2.grid(row = 8)
+        panel2.grid(row = 7, column = 1)
+        # panel2.place(x = 300, y = 350)
         self.convert_jpeg_to_pix(self.filename_closest, self.color_set)
         self.output_format(self.pix_list)
 
@@ -115,37 +154,15 @@ class GUI:
         if (len(c.get()) != 0):
             self.color_set = (c.get()).split(', ')
 
-    def TCP(self):
-        # using TCP communication
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        sock.bind("IP Address of Arduino", 8080)
-        sock.listen(1)
-
-        print("waiting for socket connection")
-        (clientsocket, address) = sock.accept()
-        print("Established a socket connection from %s on port %s" % (address))
-        s = clientsocket
-        s.settimeout(0.5)
-
-        f = open(self.filename_txt, 'r', encoding='utf_8')
-
-        with closing(sock):
-            while True:
-                line = f.readline()
-                if line:
-                    try:
-                        sock.send(line)
-                        try:
-                            rcv_data = sock.recv(1, socket.MSG_DONTWAIT)
-                            print(rcv_data)
-                        except socket.timeout as e:
-                            pass
-                        time.sleep(1)
-                    except:
-                        sock.close()
-                else:
-                    break
+    def send_to_Arduino(self):
+        os.chdir(self.directory)
+        server_address = ('', 8080)
+        s = MyServer(self.ip_addr)
+        s.start()
+        print('thread alive:', s.is_alive())  # True
+        time.sleep(30)
+        s.stop()
+        print('thread alive:', s.is_alive())  # False
 
     def Serial_Com(self):
         ser = serial.Serial(self.port.get(), 9600)
@@ -154,7 +171,7 @@ class GUI:
             line = f.readline()
             if line:
                 ser.write(line.encode('utf-8'))
-                time.sleep(1)
+                time.sleep(0.5)
             else:
                 ser.close()
                 break
@@ -196,6 +213,7 @@ class GUI:
         w, h = im.size
         im = im.convert('RGB')
         color_set_rgb = [ImageColor.getrgb(color) for color in color_set]
+        self.pix_list.clear()
         if w%2==0:
             for i in range(h):
                 for j in range(w):
@@ -214,16 +232,57 @@ class GUI:
                     self.pix_list.append((pix))
 
     def output_format(self, pix):
-        file = self.filename.split('.')
-        self.filename_txt = file[0] + '_pix.txt'
+        file = self.filename.split('/')
+        path = ''
+        for dr in file:
+            if '.' in dr:
+                continue
+            else:
+                path += dr + '/'
+        self.directory = path
+        self.filename_txt = self.directory + 'pix.txt'
+        txt = open(self.filename_txt, 'w').close()
         txt = open(self.filename_txt, 'a')
         np.savetxt(self.filename_txt, pix, fmt='%d', delimiter=" ")
         txt.close()
         return
 
+    # def dispaly_ip(self):
+    #     self.ip_txt.insert(END, "http://" + self.ip_addr + ":8888/pix.txt")
 
+# def main(IP_ADDR):
+#     test = GUI(IP_ADDR)
+#
+# if __name__ == '__main__':
+#     main(sys.argv[1] if len(sys.argv) > 1 else "")
 
 test = GUI()
 
 #need to implement menu tab
 #need to implement select menu for serial port -> done
+
+
+# README first -> instructions
+# repo name: drop to image
+
+# add title, background, centered
+# making small changes to make sure mirror worked
+
+##
+# color wheel
+# Entry box to IP Address
+# link to image
+# link to files
+# fix sets of images
+
+##
+# pictures from David to make it more clear w/ OpenCV
+# compare the original image and one from Arduino
+# photoshop filter
+# % of match, which one is wrong
+# frame shift or one drop
+
+# picture of flow
+# idealized final version and what we have right now
+# combine ok and run
+# GUI like lite brite??
