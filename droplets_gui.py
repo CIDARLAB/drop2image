@@ -14,6 +14,8 @@ import http.server
 import threading
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 import socket
+import serial
+from serial.tools import list_ports
 
 class MyServer(threading.Thread):
     def __init__(self, IP_ADDR):
@@ -43,6 +45,7 @@ class GUI:
         self.root.title("Image Loader")
         self.root.geometry("750x1000")
         self.root.resizable(width = True, height = True)
+        self.root.configure(bg='white')
 
         main_btn = Button(self.root, text = 'open image', command=lambda: self.open_img()).grid(row = 1)
         #main_btn = Button(self.root, text = 'open image', command=lambda: self.open_img()).place(x = 0, y =250)
@@ -68,11 +71,17 @@ class GUI:
         set_size_btn = Button(self.root, text = 'OK', command=lambda: self.set_size(width, height, color)).grid(row = 6)
         #set_size_btn = Button(self.root, text = 'OK', command=lambda: self.set_size(width, height, color)).place(x = 200, y = 300)
 
-        run_btn = Button(self.root, text = 'run', command = lambda: self.transformation(self.image_size, color)).grid(row = 9)
+        run_btn = Button(self.root, text = 'run', command = lambda: self.transformation(self.image_size, color)).grid(row = 8)
         #run_btn = Button(self.root, text = 'run', command = lambda: self.transformation(self.image_size, color)).place(x = 200, y = 325)
 
-        send_btn = Button(self.root, text = 'send to Arduino', command = lambda: self.send_to_Arduino()).grid(row = 10)
-        #send_btn = Button(self.root, text = 'send to Arduino', command = lambda: self.send_to_Arduino()).place(x = 0, y = 605)
+        dev = [info.device for info in list_ports.comports()]
+        self.port = StringVar()
+        select_box = ttk.Combobox(self.root, textvariable=self.port, values=dev, style='office.TCombobox').grid(row = 9)
+
+        send_btn = Button(self.root, text = 'send to Arduino', command = lambda: self.Serial_Com()).grid(row = 10)
+
+        # send_btn = Button(self.root, text = 'send to Arduino', command = lambda: self.send_to_Arduino()).grid(row = 10)
+        # send_btn = Button(self.root, text = 'send to Arduino', command = lambda: self.send_to_Arduino()).place(x = 0, y = 605)
 
         frame = ttk.Frame(self.root).grid()
         ip_txt = ttk.Entry(frame, width = 30)
@@ -116,7 +125,7 @@ class GUI:
         panel = Label(self.root, image = resized_img)
         panel.image = resized_img
         panel.grid(row = 7, column = 0)
-        #panel.place(x = 0, y = 350)
+        # panel.place(x = 0, y = 350)
         cv2_closest_resized_img = self.get_closest_image(self.src_cv2, self.color_set)
         closest_resized_img = Image.open(self.filename_closest)
         closest_resized_img = closest_resized_img.resize((250, 250), Image.Resampling.LANCZOS)
@@ -124,7 +133,7 @@ class GUI:
         panel2 = Label(self.root, image = closest_resized_img)
         panel2.image = closest_resized_img
         panel2.grid(row = 7, column = 1)
-        #panel2.place(x = 300, y = 350)
+        # panel2.place(x = 300, y = 350)
         self.convert_jpeg_to_pix(self.filename_closest, self.color_set)
         self.output_format(self.pix_list)
 
@@ -154,6 +163,20 @@ class GUI:
         time.sleep(30)
         s.stop()
         print('thread alive:', s.is_alive())  # False
+
+    def Serial_Com(self):
+        ser = serial.Serial(self.port.get(), 9600)
+        f = open(self.filename_txt, 'r', encoding='utf_8')
+        while True:
+            line = f.readline()
+            if line:
+                ser.write(line.encode('utf-8'))
+                time.sleep(0.5)
+            else:
+                ser.close()
+                break
+        f.close()
+
 
     def get_closest_color(self, pix, color):
         closest_color = None
