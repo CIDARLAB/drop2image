@@ -1,6 +1,7 @@
 import string
 import tkinter
 from tkinter import *
+from tkinter import colorchooser
 from PIL import Image
 from PIL import ImageTk
 from PIL import ImageColor
@@ -17,15 +18,6 @@ import socket
 import serial
 from serial.tools import list_ports
 
-class MyServer(threading.Thread):
-    def __init__(self, IP_ADDR):
-        threading.Thread.__init__(self)
-        self.ip_addr = IP_ADDR
-    def run(self):
-        self.server = ThreadingHTTPServer((self.ip_addr, 8888), SimpleHTTPRequestHandler)
-        self.server.serve_forever()
-    def stop(self):
-        self.server.shutdown()
 
 class GUI:
     def __init__(self):
@@ -48,48 +40,28 @@ class GUI:
         self.root.configure(bg='white')
 
         main_btn = Button(self.root, text = 'open image', command=lambda: self.open_img()).grid(row = 1)
-        #main_btn = Button(self.root, text = 'open image', command=lambda: self.open_img()).place(x = 0, y =250)
 
         frame_size = ttk.Frame(self.root, padding = (32)).grid()
         label_width = ttk.Label(frame_size, text = 'width', padding = (5,2)).grid(row = 3, column = 0, sticky =  E)
-        #label_width = ttk.Label(frame_size, text = 'width', padding = (5,2), width = 8).place(x = 0, y = 275)
         label_height = ttk.Label(frame_size, text = 'height', padding = (5,2)).grid(row = 4, column = 0, sticky = E)
-        #label_height = ttk.Label(frame_size, text = 'height', padding = (5,2), width = 8).place(x = 0, y = 300)
         label_color = ttk.Label(frame_size, text = 'color set', padding = (5,2)).grid(row = 5, column = 0, sticky = E)
-        #label_color = ttk.Label(frame_size, text = 'color set', padding = (5,2), width = 8).place(x = 0, y = 325)
 
         width = StringVar()
         width_entry = ttk.Entry(frame_size, textvariable=width, width=10).grid(row = 3, column = 1)
-        #width_entry = ttk.Entry(frame_size, textvariable=width, width=10).place(x = 80, y = 275)
         height = StringVar()
         height_entry = ttk.Entry(frame_size, textvariable=height, width=10).grid(row = 4, column = 1)
-        #height_entry = ttk.Entry(frame_size, textvariable=height, width=10).place(x = 80, y = 300)
         color = StringVar()
         color_entry = ttk.Entry(frame_size, textvariable=color, width=10).grid(row = 5, column = 1)
-        #color_entry = ttk.Entry(frame_size, textvariable=color, width=10).place(x = 80, y = 325)
 
         set_size_btn = Button(self.root, text = 'OK', command=lambda: self.set_size(width, height, color)).grid(row = 6)
-        #set_size_btn = Button(self.root, text = 'OK', command=lambda: self.set_size(width, height, color)).place(x = 200, y = 300)
 
         run_btn = Button(self.root, text = 'run', command = lambda: self.transformation(self.image_size, color)).grid(row = 8)
-        #run_btn = Button(self.root, text = 'run', command = lambda: self.transformation(self.image_size, color)).place(x = 200, y = 325)
 
         dev = [info.device for info in list_ports.comports()]
         self.port = StringVar()
         select_box = ttk.Combobox(self.root, textvariable=self.port, values=dev, style='office.TCombobox').grid(row = 9)
 
         send_btn = Button(self.root, text = 'send to Arduino', command = lambda: self.Serial_Com()).grid(row = 10)
-
-        # send_btn = Button(self.root, text = 'send to Arduino', command = lambda: self.send_to_Arduino()).grid(row = 10)
-        # send_btn = Button(self.root, text = 'send to Arduino', command = lambda: self.send_to_Arduino()).place(x = 0, y = 605)
-
-        frame = ttk.Frame(self.root).grid()
-        ip_txt = ttk.Entry(frame, width = 30)
-        ip_txt.insert(END, "http://" + self.ip_addr + ":8888/pix.txt")
-        #ip_txt.place(x = 0, y = 630)
-        ip_txt.grid(row = 11)
-
-        # disp_btn = Button(self.root, text="display IP address", command=lambda: self.dispaly_ip()).place(x = 0, y = 620)
 
         self.root.mainloop()
 
@@ -102,7 +74,7 @@ class GUI:
         # open the image and display
         img = Image.open(self.filename)
         self.src = img
-        img = img.resize((250, 250), Image.Resampling.LANCZOS)
+        img = img.resize((200, 200), Image.Resampling.LANCZOS)
 
         # PhotoImage class is used to add image to widgets, icons etc
         img = ImageTk.PhotoImage(img)
@@ -154,18 +126,9 @@ class GUI:
         if (len(c.get()) != 0):
             self.color_set = (c.get()).split(', ')
 
-    def send_to_Arduino(self):
-        os.chdir(self.directory)
-        server_address = ('', 8080)
-        s = MyServer(self.ip_addr)
-        s.start()
-        print('thread alive:', s.is_alive())  # True
-        time.sleep(30)
-        s.stop()
-        print('thread alive:', s.is_alive())  # False
-
     def Serial_Com(self):
         ser = serial.Serial(self.port.get(), 9600)
+        print(self.filename_txt)
         f = open(self.filename_txt, 'r', encoding='utf_8')
         while True:
             line = f.readline()
@@ -176,7 +139,6 @@ class GUI:
                 ser.close()
                 break
         f.close()
-
 
     def get_closest_color(self, pix, color):
         closest_color = None
@@ -247,20 +209,13 @@ class GUI:
         txt.close()
         return
 
-    # def dispaly_ip(self):
-    #     self.ip_txt.insert(END, "http://" + self.ip_addr + ":8888/pix.txt")
+        
 
-# def main(IP_ADDR):
-#     test = GUI(IP_ADDR)
-#
-# if __name__ == '__main__':
-#     main(sys.argv[1] if len(sys.argv) > 1 else "")
-
-test = GUI()
+if __name__ == '__main__':
+    test = GUI()
 
 #need to implement menu tab
 #need to implement select menu for serial port -> done
-
 
 # README first -> instructions
 # repo name: drop to image
