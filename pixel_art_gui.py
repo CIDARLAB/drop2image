@@ -1,10 +1,14 @@
 from ctypes import sizeof
 from tkinter import *
 from tkinter import filedialog
+from tkinter.ttk import Combobox
 from tkmacosx import Button
 import string
 from turtle import back, color
 import numpy as np
+import serial
+from serial.tools import list_ports
+import time
 
 class GUI:
     def __init__(self):
@@ -19,6 +23,7 @@ class GUI:
         self.y = 15
         self.pix_list = []
         self.save_filename = None
+        self.port = None
 
         self.root.title("Pixel Art GUI")
         self.root.geometry("1000x1000")
@@ -38,6 +43,8 @@ class GUI:
         white_btn = Button(main_frm, command= lambda: self.set_color('white'), bg='white', width=50).grid(row=1, column=3)
         reset_btn = Button(main_frm, command= lambda: self.set_color('gray'), bg='gray', width=50).grid(row=1, column=4)
 
+        # override red cross
+
         for i in range(self.y):
             pix_btn_row = []
             for j in range(self.x):
@@ -48,13 +55,18 @@ class GUI:
         save_btn = Button(self.root, command= lambda: self.save_pix(), text='Save').grid(row=self.y+3, column=self.x+1)
         save_as_btn = Button(self.root, command= lambda: self.save_as_pix(), text= 'Save as').grid(row=self.y+4, column=self.x+1)
 
+        dev = [info.device for info in list_ports.comports()]
+        self.port = StringVar()
+        select_port_box = Combobox(self.root, textvariable=self.port, values=dev, style='office.TCombobox').grid(row=self.y+5, column=self.x+1)
+        send_btn = Button(self.root, command= lambda: self.send(), text='Send').grid(row=self.y+6, column=self.x+1)
+
         self.root.mainloop()
 
     def set_color(self, color):
         self.cur_color = color
 
     def change_pix(self, i, j):
-        red_cross = PhotoImage(file= r"/Users/kaedekawata/Documents/STEM_Pathway/droplets/emoji_test/red_x.png").subsample(8,8)
+        red_cross = PhotoImage(file= r"emoji_test/red_x.png").subsample(8,8)
         if (self.cur_color == 'purple'):
             self.pix_btn[i][j].config(image= red_cross)
         self.pix_btn[i][j].config(bg=self.cur_color)
@@ -92,6 +104,7 @@ class GUI:
             self.save_filename = filedialog.asksaveasfilename(defaultextension='.txt', filetypes=[('Text files', '*.txt')], title="Choose filename")
         with open(self.save_filename, 'w'):
             np.savetxt(self.save_filename, self.pix_list, fmt='%d', delimiter=' ')
+        print(self.port.get())
 
     def save_as_pix(self):
         self.pix_list = []
@@ -100,6 +113,19 @@ class GUI:
         with open(self.save_filename, 'w'):
             np.savetxt(self.save_filename, self.pix_list, fmt='%d', delimiter=' ')
 
+    def write_read(self, arduino, text):
+        arduino.write(bytes(text, 'utf-8'))
+        time.sleep(0.05)
+
+    def send(self):
+        arduino = serial.Serial(port=self.port.get(), baudrate=115200, timeout=.1)
+        print(self.save_filename)
+        with open(self.save_filename) as f:
+            lines = f.readlines()
+            for line in lines:
+                line = line.strip()
+                self.write_read(arduino, line)
+                time.sleep(0.5)
 
 if __name__ == '__main__':
     test = GUI()

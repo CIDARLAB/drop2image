@@ -5,7 +5,7 @@ import time
 
 def send():
     dev = [info.device for info in list_ports.comports()]
-    filename = '/Users/kaedekawata/Documents/STEM_Pathway/droplets/emoji_test/pix.txt' # set your path here
+    filename = '' # set your path here
     if filename == '':
         filename = input('Enter absolute path to the file: ')
     cnt = 0
