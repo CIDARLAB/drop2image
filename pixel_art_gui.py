@@ -19,8 +19,8 @@ class GUI:
         # what should be the default color??
         # skip = red x
         # default = black
-        self.x = 15
-        self.y = 15
+        self.x = 11
+        self.y = 11
         self.pix_list = []
         self.save_filename = None
         self.port = None
@@ -125,7 +125,8 @@ class GUI:
             for line in lines:
                 line = line.strip()
                 self.write_read(arduino, line)
-                time.sleep(0.5)
+                time.sleep(0.1)
+        print("Done")
 
 if __name__ == '__main__':
     test = GUI()
