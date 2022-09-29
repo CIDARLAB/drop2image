@@ -2,7 +2,7 @@ from ctypes import sizeof
 from tkinter import *
 from tkinter import filedialog
 from tkinter.ttk import Combobox
-from tkmacosx import Button
+# from tkmacosx import Button
 import string
 from turtle import back, color
 import numpy as np
@@ -16,7 +16,6 @@ class GUI:
         self.root = Tk()
         self.pix_btn = []
         self.color_set = ['gray', 'black', 'blue', 'red', 'green', 'yellow', 'pink', 'cyan', 'white']
-        # what should be the default color??
         # skip = red x
         # default = black
         self.x = 11
@@ -32,23 +31,23 @@ class GUI:
 
         myscrollbar=Scrollbar(main_frm, orient="vertical").grid(row=0, column=16, sticky=NS)
 
-        black_btn = Button(main_frm, command = lambda: self.set_color('black'), bg='black', width=50).grid(row=0, column=0)
-        blue_btn = Button(main_frm, command = lambda: self.set_color('blue'), bg='blue', width=50).grid(row=0, column=1)
-        red_btn = Button(main_frm, command = lambda: self.set_color('red'), bg='red', width=50).grid(row=0, column=2)
-        green_btn = Button(main_frm, command= lambda: self.set_color('green'), bg='green', width=50).grid(row=0, column=3)
-        skip_btn = Button(main_frm, command= lambda: self.set_color('purple'), width=50, text='skip').grid(row=0, column=4)
-        yellow_btn = Button(main_frm, command= lambda: self.set_color('yellow'), bg='yellow', width=50).grid(row=1, column=0)
-        pink_btn = Button(main_frm, command= lambda: self.set_color('pink'), bg='pink', width=50).grid(row=1, column=1)
-        cyan_btn = Button(main_frm, command= lambda: self.set_color('cyan'), bg='cyan', width=50).grid(row=1, column=2)
-        white_btn = Button(main_frm, command= lambda: self.set_color('white'), bg='white', width=50).grid(row=1, column=3)
-        reset_btn = Button(main_frm, command= lambda: self.set_color('gray'), bg='gray', width=50).grid(row=1, column=4)
+        black_btn = Button(main_frm, command = lambda: self.set_color('black'), bg='black', width=5).grid(row=0, column=0)
+        blue_btn = Button(main_frm, command = lambda: self.set_color('blue'), bg='blue', width=5).grid(row=0, column=1)
+        red_btn = Button(main_frm, command = lambda: self.set_color('red'), bg='red', width=5).grid(row=0, column=2)
+        green_btn = Button(main_frm, command= lambda: self.set_color('green'), bg='green', width=5).grid(row=0, column=3)
+        skip_btn = Button(main_frm, command= lambda: self.set_color('purple'), width=5, text='skip').grid(row=0, column=4)
+        yellow_btn = Button(main_frm, command= lambda: self.set_color('yellow'), bg='yellow', width=5).grid(row=1, column=0)
+        pink_btn = Button(main_frm, command= lambda: self.set_color('pink'), bg='pink', width=5).grid(row=1, column=1)
+        cyan_btn = Button(main_frm, command= lambda: self.set_color('cyan'), bg='cyan', width=5).grid(row=1, column=2)
+        white_btn = Button(main_frm, command= lambda: self.set_color('white'), bg='white', width=5).grid(row=1, column=3)
+        reset_btn = Button(main_frm, command= lambda: self.set_color('gray'), bg='gray', width=5).grid(row=1, column=4)
 
         # override red cross
 
         for i in range(self.y):
             pix_btn_row = []
             for j in range(self.x):
-                pix_btn_row.append(Button(main_frm, command= lambda i=i, j=j: self.change_pix(i,j), width=50, height=50, bg='gray'))
+                pix_btn_row.append(Button(main_frm, command= lambda i=i, j=j: self.change_pix(i,j), width=5, height=2, bg='gray'))
                 pix_btn_row[j].grid(row=i+2, column=j)
             self.pix_btn.append(pix_btn_row)
 
@@ -76,25 +75,41 @@ class GUI:
             for i in range(self.y):
                 for j in range(self.x):
                     if i%2==0:
-                        if (self.pix_btn[i][j].cget('bg') == 'purple'):
+                        clr = self.pix_btn[i][j].cget('bg')
+                        if (clr == 'purple'):
                             continue
-                        pix = self.color_set.index(self.pix_btn[i][j].cget('bg'))
+                        if (clr == 'gray'):
+                            pix = 0
+                        else:
+                            pix = self.color_set.index(clr) - 1
                     else:
-                        if (self.pix_btn[i][self.x-1-j].cget('bg') == 'purple'):
+                        clr = self.pix_btn[i][self.x-1-j].cget('bg')
+                        if (clr == 'purple'):
                             continue
-                        pix = self.color_set.index(self.pix_btn[i][self.x-1-j].cget('bg'))
+                        if (clr == 'gray'):
+                            pix = 0
+                        else:
+                            pix = self.color_set.index(clr) - 1
                     self.pix_list.append(pix)
         else:
             for i in range(self.y):
                 for j in range(self.x):
                     if i%2==0:
-                        if (self.pix_btn[i][self.x-1-j].cget('bg') == 'purple'):
+                        clr = self.pix_btn[i][self.x-1-j].cget('bg')
+                        if (clr == 'purple'):
                             continue
-                        pix = self.color_set.index(self.pix_btn[i][self.x-1-j].cget('bg'))
+                        if (clr == 'gray'):
+                            pix = 0
+                        else:
+                            pix = self.color_set.index(clr) - 1
                     else:
-                        if (self.pix_btn[i][j].cget('bg') == 'purple'):
+                        clr = self.pix_btn[i][j].cget('bg')
+                        if (clr == 'purple'):
                             continue
-                        pix = self.color_set.index(self.pix_btn[i][j].cget('bg'))
+                        if (clr == 'gray'):
+                            pix = 0
+                        else:
+                            pix = self.color_set.index(clr) - 1
                     self.pix_list.append(pix)
 
     def save_pix(self):
@@ -119,14 +134,28 @@ class GUI:
 
     def send(self):
         arduino = serial.Serial(port=self.port.get(), baudrate=115200, timeout=.1)
-        print(self.save_filename)
         with open(self.save_filename) as f:
             lines = f.readlines()
             for line in lines:
                 line = line.strip()
                 self.write_read(arduino, line)
                 time.sleep(0.1)
-        print("Done")
+        num = ''
+        with open(self.save_filename) as f:
+            l = f.readline()
+            while l:
+                num += l.strip()
+                l = f.readline()
+        arduino.write(bytes(num[0,61], 'utf-8'))
+        arduino.write(bytes('\n', 'utf-8'))
+        time.sleep(5)
+        arduino.write(bytes(num[61:121], 'utf-8'))
+        time.sleep(0.05)   
+
+        while True:
+            time.sleep(0.05)
+            data = arduino.readline()
+            print(data) 
 
 if __name__ == '__main__':
     test = GUI()

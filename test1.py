@@ -3,7 +3,12 @@ import time
 arduino = serial.Serial(port='COM3', baudrate=115200, timeout=.1)
 
 time.sleep(2)
-num = '1111110000011111100000111111000001111110000011111100000111111000001111110000011111100000111111000001111110000011111100000'
+num = ''
+with open("emoji_test/pix_art_gui.txt") as f:
+    l = f.readline()
+    while l:
+        num += l.strip()
+        l = f.readline()
 # open file and read data into string
 arduino.write(bytes(num[0:61], 'utf-8'))
 arduino.write(bytes('\n', 'utf-8'))
@@ -16,7 +21,6 @@ while True:
     data = arduino.readline()
     print(data)
 
-# 
 # what type of data you want to display
 # how much delays in one loop -> 2 ms
 # sorting 150 ms
