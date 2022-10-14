@@ -1,6 +1,7 @@
 import serial
 import time
-arduino = serial.Serial(port='COM3', baudrate=115200, timeout=.1)
+arduino = serial.Serial(port='COM4', baudrate=115200, timeout=.1)
+arduino.stopbits=2
 
 time.sleep(2)
 num = ''

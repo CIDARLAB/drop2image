@@ -18,9 +18,10 @@ class GUI:
         self.color_set = ['gray', 'black', 'blue', 'red', 'green', 'yellow', 'pink', 'cyan', 'white']
         # skip = red x
         # default = black
-        self.x = 11
-        self.y = 11
+        self.x = 25
+        self.y = 25
         self.pix_list = []
+        self.pix_mat = None
         self.save_filename = None
         self.port = None
 
@@ -30,34 +31,36 @@ class GUI:
         main_frm = Frame(self.root).grid(row=0, column=0)
 
         myscrollbar=Scrollbar(main_frm, orient="vertical").grid(row=0, column=16, sticky=NS)
+        w = 3
 
-        black_btn = Button(main_frm, command = lambda: self.set_color('black'), bg='black', width=5).grid(row=0, column=0)
-        blue_btn = Button(main_frm, command = lambda: self.set_color('blue'), bg='blue', width=5).grid(row=0, column=1)
-        red_btn = Button(main_frm, command = lambda: self.set_color('red'), bg='red', width=5).grid(row=0, column=2)
-        green_btn = Button(main_frm, command= lambda: self.set_color('green'), bg='green', width=5).grid(row=0, column=3)
-        skip_btn = Button(main_frm, command= lambda: self.set_color('purple'), width=5, text='skip').grid(row=0, column=4)
-        yellow_btn = Button(main_frm, command= lambda: self.set_color('yellow'), bg='yellow', width=5).grid(row=1, column=0)
-        pink_btn = Button(main_frm, command= lambda: self.set_color('pink'), bg='pink', width=5).grid(row=1, column=1)
-        cyan_btn = Button(main_frm, command= lambda: self.set_color('cyan'), bg='cyan', width=5).grid(row=1, column=2)
-        white_btn = Button(main_frm, command= lambda: self.set_color('white'), bg='white', width=5).grid(row=1, column=3)
-        reset_btn = Button(main_frm, command= lambda: self.set_color('gray'), bg='gray', width=5).grid(row=1, column=4)
+        black_btn = Button(main_frm, command = lambda: self.set_color('black'), bg='black', width=w).grid(row=0, column=0)
+        blue_btn = Button(main_frm, command = lambda: self.set_color('blue'), bg='blue', width=w).grid(row=0, column=1)
+        red_btn = Button(main_frm, command = lambda: self.set_color('red'), bg='red', width=w).grid(row=0, column=2)
+        green_btn = Button(main_frm, command= lambda: self.set_color('green'), bg='green', width=w).grid(row=0, column=3)
+        skip_btn = Button(main_frm, command= lambda: self.set_color('purple'), width=w, text='skip').grid(row=0, column=4)
+        yellow_btn = Button(main_frm, command= lambda: self.set_color('yellow'), bg='yellow', width=w).grid(row=1, column=0)
+        pink_btn = Button(main_frm, command= lambda: self.set_color('pink'), bg='pink', width=w).grid(row=1, column=1)
+        cyan_btn = Button(main_frm, command= lambda: self.set_color('cyan'), bg='cyan', width=w).grid(row=1, column=2)
+        white_btn = Button(main_frm, command= lambda: self.set_color('white'), bg='white', width=w).grid(row=1, column=3)
+        reset_btn = Button(main_frm, command= lambda: self.set_color('gray'), bg='gray', width=w).grid(row=1, column=4)
 
         # override red cross
 
         for i in range(self.y):
             pix_btn_row = []
             for j in range(self.x):
-                pix_btn_row.append(Button(main_frm, command= lambda i=i, j=j: self.change_pix(i,j), width=5, height=2, bg='gray'))
+                pix_btn_row.append(Button(main_frm, command= lambda i=i, j=j: self.change_pix(i,j), width=w, height=int(w/2), bg='gray'))
                 pix_btn_row[j].grid(row=i+2, column=j)
             self.pix_btn.append(pix_btn_row)
 
         save_btn = Button(self.root, command= lambda: self.save_pix(), text='Save').grid(row=self.y+3, column=self.x+1)
         save_as_btn = Button(self.root, command= lambda: self.save_as_pix(), text= 'Save as').grid(row=self.y+4, column=self.x+1)
+        partition_button = Button(self.root, command= lambda: self.partition(), text= 'Partition Mosaic').grid(row=self.y+5, column=self.x+1)
 
         dev = [info.device for info in list_ports.comports()]
         self.port = StringVar()
-        select_port_box = Combobox(self.root, textvariable=self.port, values=dev, style='office.TCombobox').grid(row=self.y+5, column=self.x+1)
-        send_btn = Button(self.root, command= lambda: self.send(), text='Send').grid(row=self.y+6, column=self.x+1)
+        select_port_box = Combobox(self.root, textvariable=self.port, values=dev, style='office.TCombobox').grid(row=self.y+6, column=self.x+1)
+        send_btn = Button(self.root, command= lambda: self.send(), text='Send').grid(row=self.y+7, column=self.x+1)
 
         self.root.mainloop()
 
@@ -156,6 +159,33 @@ class GUI:
             time.sleep(0.05)
             data = arduino.readline()
             print(data) 
+
+    def partition(self):
+        # take self.pix_list and resize into a matrix of x by y
+        self.format_pix()
+        self.pix_mat = np.reshape(np.array(self.pix_list), (self.x, self.y))
+
+        # split matrix by 5x5 groups (assume now perfectly divisible)
+        x_num = int(self.x/5)
+        y_num = int(self.y/5)
+        total_windows = x_num*y_num
+
+        self.save_filename = filedialog.asksaveasfilename(defaultextension='.txt', filetypes=[('Text files', '*.txt')], title="Choose filename")
+        for m in range(y_num):
+            for n in range(x_num):
+                partition = self.pix_mat[m*5:(m+1)*5, n*5:(n+1)*5]
+                partition_list = np.ravel(partition)
+                f_split = str.split(self.save_filename, sep=".")
+                partition_filename = f_split[0] + "_" + str(m) + str(n) + "." + f_split[1]
+                with open(partition_filename, 'w'):
+                    np.savetxt(partition_filename, partition_list, fmt='%d', delimiter=' ')
+
+
+
+
+        # ravel them out into lists
+        # save as enumerated txt files
+
 
 if __name__ == '__main__':
     test = GUI()

@@ -4,6 +4,7 @@ int len = 0;
 int pix[130];
 int done = 0;
 
+//COPY ALL SETUP
 void setup() {
  Serial.begin(115200);
  Serial.setTimeout(1);
@@ -24,9 +25,11 @@ void loop() {
   if (cnt < 121){
   Serial.print(pix[cnt]);
   cnt++;
+  delay(500);
   }
 }
 
+// NEED TO HAVE THIS
 void parse(String in){
   int x=0;
   if (done!=0){ x=61; }

@@ -9,11 +9,10 @@ void setup() {
     pix[i] = Serial.readString().toInt();
   }
   Serial.end();
-  Serial.begin(9600);
+  Serial.begin(115200);
 }
 void loop() {
-  Serial.print(pix[x]);
+  Serial.print("hello world");
   x++;
   delay(1000);
 }
-
