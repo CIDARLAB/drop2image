@@ -18,7 +18,7 @@ class GUI:
         self.color_set = ['gray', 'black', 'blue', 'red', 'green', 'yellow', 'pink', 'cyan', 'white']
         # skip = red x
         # default = black
-        self.x = 25
+        self.x = 50
         self.y = 25
         self.pix_list = []
         self.pix_mat = None
@@ -75,6 +75,7 @@ class GUI:
         self.pix_btn[i][j].config(bg=self.cur_color)
 
     def format_pix(self):
+        self.pix_list = []
         if self.y%2==0:
             for i in range(self.y):
                 for j in range(self.x):
@@ -184,14 +185,14 @@ class GUI:
     def load_image(self):
         self.load_filename = filedialog.askopenfilename(defaultextension=".txt")
         i = 0
-        self.pix_mat = np.zeros((self.x, self.y), dtype=int)
+        self.pix_mat = np.zeros((self.y, self.x), dtype=int)
         with open(self.load_filename, 'r', encoding='utf_8') as f:
             l = f.readline()
             while l:
                 self.pix_mat[int(i/self.x), int(i%self.x)] = int(l.strip())
                 l = f.readline()
                 i += 1
-        self.pix_list = np.ravel(self.pix_mat)
+        self.pix_list = list(np.ravel(self.pix_mat))
 
         # Now - want to set color and change pix
         for i, px in enumerate(self.pix_list):

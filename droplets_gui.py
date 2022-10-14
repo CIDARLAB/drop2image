@@ -32,7 +32,8 @@ class GUI:
         self.root = Tk()
         self.image_size = (10,10) #default 10x10
         self.pix_list = []
-        self.color_set = ['#FFFFFF', '#000000'] #default Black and White
+        #color order: ['black', 'blue', 'red', 'green', 'yellow', 'pink', 'cyan', 'white']
+        self.color_set = ['#000000', '#0000FF', '#FF0000', '#00FF00', '#FFFF00', '#FF00FF', '#00FFFF','#FFFFFF'] #default Black and White
 
         self.root.title("Image Loader")
         self.root.geometry("750x1000")
@@ -179,18 +180,18 @@ class GUI:
         if w%2==0:
             for i in range(h):
                 for j in range(w):
-                    if i%2==0:
-                        pix = color_set_rgb.index(im.getpixel((j,i)))
-                    else:
-                        pix = color_set_rgb.index(im.getpixel((w-1-j,i)))
+                    # if i%2==0:
+                    pix = color_set_rgb.index(im.getpixel((j,i)))
+                    # else:
+                    #pix = color_set_rgb.index(im.getpixel((w-1-j,i)))
                     self.pix_list.append(pix)
         else:
             for i in range(h):
                 for j in range(w):
-                    if i%2==0:
-                        pix = color_set_rgb.index(im.getpixel((w-1-j,i)))
-                    else:
-                        pix = color_set_rgb.index(im.getpixel((j,i)))
+                    # if i%2==0:
+                    #pix = color_set_rgb.index(im.getpixel((w-1-j,i)))
+                    # else:
+                    pix = color_set_rgb.index(im.getpixel((j,i)))
                     self.pix_list.append((pix))
 
     def output_format(self, pix):
@@ -202,7 +203,7 @@ class GUI:
             else:
                 path += dr + '/'
         self.directory = path
-        self.filename_txt = self.directory + 'pix.txt'
+        self.filename_txt = self.directory + self.filename.split("/")[-1].split(".")[0] + ".txt"
         txt = open(self.filename_txt, 'w').close()
         txt = open(self.filename_txt, 'a')
         np.savetxt(self.filename_txt, pix, fmt='%d', delimiter=" ")
