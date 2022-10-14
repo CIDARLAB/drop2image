@@ -61,6 +61,7 @@ class GUI:
         self.port = StringVar()
         select_port_box = Combobox(self.root, textvariable=self.port, values=dev, style='office.TCombobox').grid(row=self.y+6, column=self.x+1)
         send_btn = Button(self.root, command= lambda: self.send(), text='Send').grid(row=self.y+7, column=self.x+1)
+        load_btn = Button(self.root, command=lambda: self.load_image(), text='Load').grid(row=self.y + 8, column=self.x + 1)
 
         self.root.mainloop()
 
@@ -180,12 +181,23 @@ class GUI:
                 with open(partition_filename, 'w'):
                     np.savetxt(partition_filename, partition_list, fmt='%d', delimiter=' ')
 
+    def load_image(self):
+        self.load_filename = filedialog.askopenfilename(defaultextension=".txt")
+        i = 0
+        self.pix_mat = np.zeros((self.x, self.y), dtype=int)
+        with open(self.load_filename, 'r', encoding='utf_8') as f:
+            l = f.readline()
+            while l:
+                self.pix_mat[int(i/self.x), int(i%self.x)] = int(l.strip())
+                l = f.readline()
+                i += 1
+        self.pix_list = np.ravel(self.pix_mat)
 
-
-
-        # ravel them out into lists
-        # save as enumerated txt files
-
+        # Now - want to set color and change pix
+        for i, px in enumerate(self.pix_list):
+            self.set_color(self.color_set[px+1])
+            self.color_set[px+1]
+            self.change_pix(int(i/self.x), int(i%self.x))
 
 if __name__ == '__main__':
     test = GUI()
