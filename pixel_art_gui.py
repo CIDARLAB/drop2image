@@ -2,7 +2,7 @@ from ctypes import sizeof
 from tkinter import *
 from tkinter import filedialog
 from tkinter.ttk import Combobox
-# from tkmacosx import Button
+from tkmacosx import Button
 import string
 from turtle import back, color
 import numpy as np
@@ -18,8 +18,8 @@ class GUI:
         self.color_set = ['gray', 'black', 'blue', 'red', 'green', 'yellow', 'pink', 'cyan', 'white']
         # skip = red x
         # default = black
-        self.x = 11
-        self.y = 11
+        self.x = 5
+        self.y = 5
         self.pix_list = []
         self.save_filename = None
         self.port = None
@@ -160,4 +160,8 @@ class GUI:
 if __name__ == '__main__':
     test = GUI()
 
-# 
+# stiching images together
+# naming convention
+# config file 
+# #1 have the ability to upload a picture AND a text file
+# partitioning 16x16 -> 5x5 how to deal with extras
