@@ -1,14 +1,17 @@
 from ctypes import sizeof
+from fileinput import close
 from tkinter import *
 from tkinter import filedialog
 from tkinter.ttk import Combobox
-from tkmacosx import Button
+# from tkmacosx import Button
 import string
 from turtle import back, color
 import numpy as np
 import serial
 from serial.tools import list_ports
 import time
+from PIL import ImageColor
+import cv2
 
 class GUI:
     def __init__(self):
@@ -16,6 +19,7 @@ class GUI:
         self.root = Tk()
         self.pix_btn = []
         self.color_set = ['gray', 'black', 'blue', 'red', 'green', 'yellow', 'pink', 'cyan', 'white']
+        self.color_set_hex = ['#808080', '#000000', '#0000FF', '#FF0000', '#00FF00', '#FFFF00', '#FFC0CB', '#00FFFF', '#FFFFFF']
         # skip = red x
         # default = black
         self.x = 5
@@ -23,6 +27,7 @@ class GUI:
         self.pix_list = []
         self.save_filename = None
         self.port = None
+        self.upload_filename = None
 
         self.root.title("Pixel Art GUI")
         self.root.geometry("1000x1000")
@@ -58,6 +63,8 @@ class GUI:
         self.port = StringVar()
         select_port_box = Combobox(self.root, textvariable=self.port, values=dev, style='office.TCombobox').grid(row=self.y+5, column=self.x+1)
         send_btn = Button(self.root, command= lambda: self.send(), text='Send').grid(row=self.y+6, column=self.x+1)
+
+        upload_btn = Button(self.root, command= lambda: self.upload(), text='Upload').grid(row=self.y+7, column=self.x+1)
 
         self.root.mainloop()
 
@@ -157,6 +164,31 @@ class GUI:
             data = arduino.readline()
             print(data) 
 
+    def get_closest_color(self, pix):
+        color = [ImageColor.getrgb(color) for color in self.color_set_hex]
+        closest_color = None
+        min_diff = 100000
+        pix = np.array(pix)
+        for clr in color:
+            clr = np.array(clr)
+            diff = np.sum((clr-pix)**2)
+            if diff < min_diff:
+                min_diff = diff
+                closest_color = clr
+        return closest_color
+
+    def upload(self):
+        self.upload_filename = filedialog.askopenfilename(title="original")
+        src = cv2.imread(self.upload_filename)
+        h,w,c = src.shape
+        clr_list = []
+        for i in range(h):
+            for j in range(w):
+                b,g,r = src[i,j]
+                c_r, c_g, c_b = self.get_closest_color((r,g,b))
+                hex_color = '#%02x%02x%02x' % (c_r, c_g, c_b)
+                self.pix_btn[i][j].config(bg=hex_color)
+
 if __name__ == '__main__':
     test = GUI()
 
@@ -165,3 +197,5 @@ if __name__ == '__main__':
 # config file 
 # #1 have the ability to upload a picture AND a text file
 # partitioning 16x16 -> 5x5 how to deal with extras
+
+## asuming the uploaded picture is in the same dimention
