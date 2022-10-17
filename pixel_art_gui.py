@@ -36,16 +36,16 @@ class GUI:
 
         myscrollbar=Scrollbar(main_frm, orient="vertical").grid(row=0, column=16, sticky=NS)
 
-        black_btn = Button(main_frm, command = lambda: self.set_color('black'), bg='black', width=5).grid(row=0, column=0)
-        blue_btn = Button(main_frm, command = lambda: self.set_color('blue'), bg='blue', width=5).grid(row=0, column=1)
-        red_btn = Button(main_frm, command = lambda: self.set_color('red'), bg='red', width=5).grid(row=0, column=2)
-        green_btn = Button(main_frm, command= lambda: self.set_color('green'), bg='green', width=5).grid(row=0, column=3)
-        skip_btn = Button(main_frm, command= lambda: self.set_color('purple'), width=5, text='skip').grid(row=0, column=4)
-        yellow_btn = Button(main_frm, command= lambda: self.set_color('yellow'), bg='yellow', width=5).grid(row=1, column=0)
-        pink_btn = Button(main_frm, command= lambda: self.set_color('pink'), bg='pink', width=5).grid(row=1, column=1)
-        cyan_btn = Button(main_frm, command= lambda: self.set_color('cyan'), bg='cyan', width=5).grid(row=1, column=2)
-        white_btn = Button(main_frm, command= lambda: self.set_color('white'), bg='white', width=5).grid(row=1, column=3)
-        reset_btn = Button(main_frm, command= lambda: self.set_color('gray'), bg='gray', width=5).grid(row=1, column=4)
+        black_btn = Button(main_frm, command = lambda: self.set_color(self.color_set_hex[1]), bg='black', width=5).grid(row=0, column=0)
+        blue_btn = Button(main_frm, command = lambda: self.set_color(self.color_set_hex[2]), bg='blue', width=5).grid(row=0, column=1)
+        red_btn = Button(main_frm, command = lambda: self.set_color(self.color_set_hex[3]), bg='red', width=5).grid(row=0, column=2)
+        green_btn = Button(main_frm, command= lambda: self.set_color(self.color_set_hex[4]), bg='green', width=5).grid(row=0, column=3)
+        skip_btn = Button(main_frm, command= lambda: self.set_color('#A020F0'), width=5, text='skip').grid(row=0, column=4)
+        yellow_btn = Button(main_frm, command= lambda: self.set_color(self.color_set_hex[5]), bg='yellow', width=5).grid(row=1, column=0)
+        pink_btn = Button(main_frm, command= lambda: self.set_color(self.color_set_hex[6]), bg='pink', width=5).grid(row=1, column=1)
+        cyan_btn = Button(main_frm, command= lambda: self.set_color(self.color_set_hex[7]), bg='cyan', width=5).grid(row=1, column=2)
+        white_btn = Button(main_frm, command= lambda: self.set_color(self.color_set_hex[8]), bg='white', width=5).grid(row=1, column=3)
+        reset_btn = Button(main_frm, command= lambda: self.set_color(self.color_set_hex[0]), bg='gray', width=5).grid(row=1, column=4)
 
         # override red cross
 
@@ -64,7 +64,9 @@ class GUI:
         select_port_box = Combobox(self.root, textvariable=self.port, values=dev, style='office.TCombobox').grid(row=self.y+5, column=self.x+1)
         send_btn = Button(self.root, command= lambda: self.send(), text='Send').grid(row=self.y+6, column=self.x+1)
 
-        upload_btn = Button(self.root, command= lambda: self.upload(), text='Upload').grid(row=self.y+7, column=self.x+1)
+        upload_img_btn = Button(self.root, command= lambda: self.upload_img(), text='Upload Image').grid(row=self.y+7, column=self.x+1)
+
+        upload_txt_btn = Button(self.root, command= lambda: self.upload_txt(), text="Upload Text").grid(row=self.y+8, column=self.x+1)
 
         self.root.mainloop()
 
@@ -73,7 +75,7 @@ class GUI:
 
     def change_pix(self, i, j):
         red_cross = PhotoImage(file= r"emoji_test/red_x.png").subsample(8,8)
-        if (self.cur_color == 'purple'):
+        if (self.cur_color == '#A020F0'):
             self.pix_btn[i][j].config(image= red_cross)
         self.pix_btn[i][j].config(bg=self.cur_color)
 
@@ -82,41 +84,41 @@ class GUI:
             for i in range(self.y):
                 for j in range(self.x):
                     if i%2==0:
-                        clr = self.pix_btn[i][j].cget('bg')
-                        if (clr == 'purple'):
+                        clr = self.pix_btn[i][j].cget('bg').upper()
+                        if (clr == '#A020F0'):
                             continue
-                        if (clr == 'gray'):
+                        if (clr == self.color_set_hex[0]):
                             pix = 0
                         else:
-                            pix = self.color_set.index(clr) - 1
+                            pix = self.color_set_hex.index(clr) - 1
                     else:
-                        clr = self.pix_btn[i][self.x-1-j].cget('bg')
-                        if (clr == 'purple'):
+                        clr = self.pix_btn[i][self.x-1-j].cget('bg').upper()
+                        if (clr == '#A020F0'):
                             continue
-                        if (clr == 'gray'):
+                        if (clr == self.color_set_hex[0]):
                             pix = 0
                         else:
-                            pix = self.color_set.index(clr) - 1
+                            pix = self.color_set_hex.index(clr) - 1
                     self.pix_list.append(pix)
         else:
             for i in range(self.y):
                 for j in range(self.x):
                     if i%2==0:
-                        clr = self.pix_btn[i][self.x-1-j].cget('bg')
-                        if (clr == 'purple'):
+                        clr = self.pix_btn[i][self.x-1-j].cget('bg').upper()
+                        if (clr == '#A020F0'):
                             continue
-                        if (clr == 'gray'):
+                        if (clr == self.color_set_hex[0]):
                             pix = 0
                         else:
-                            pix = self.color_set.index(clr) - 1
+                            pix = self.color_set_hex.index(clr) - 1
                     else:
-                        clr = self.pix_btn[i][j].cget('bg')
-                        if (clr == 'purple'):
+                        clr = self.pix_btn[i][j].cget('bg').upper()
+                        if (clr == '#A020F0'):
                             continue
-                        if (clr == 'gray'):
+                        if (clr == self.color_set_hex[0]):
                             pix = 0
                         else:
-                            pix = self.color_set.index(clr) - 1
+                            pix = self.color_set_hex.index(clr) - 1
                     self.pix_list.append(pix)
 
     def save_pix(self):
@@ -153,7 +155,7 @@ class GUI:
             while l:
                 num += l.strip()
                 l = f.readline()
-        arduino.write(bytes(num[0,61], 'utf-8'))
+        arduino.write(bytes(num[0:61], 'utf-8'))
         arduino.write(bytes('\n', 'utf-8'))
         time.sleep(5)
         arduino.write(bytes(num[61:121], 'utf-8'))
@@ -163,6 +165,30 @@ class GUI:
             time.sleep(0.05)
             data = arduino.readline()
             print(data) 
+
+    def upload_txt(self):
+        self.upload_filename = filedialog.askopenfilename(title="original")
+        with open(self.upload_filename, 'r') as f:
+            indexes = f.read().splitlines()
+        cnt = 0
+        if self.y%2==0:
+            for i in range(self.y):
+                for j in range(self.x):
+                    if i%2==0:
+                        self.pix_btn[i][j].config(bg=self.color_set[int(indexes[cnt])+1])
+                        cnt = cnt + 1
+                    else:
+                        self.pix_btn[i][self.x-1-j].config(bg=self.color_set[int(indexes[cnt])+1])
+                        cnt = cnt + 1
+        else:
+            for i in range(self.y):
+                for j in range(self.x):
+                    if i%2==0:
+                        self.pix_btn[i][self.x-1-j].config(bg=self.color_set[int(indexes[cnt])+1])
+                        cnt = cnt + 1
+                    else:
+                        self.pix_btn[i][j].config(bg=self.color_set[int(indexes[cnt])+1])
+                        cnt = cnt + 1
 
     def get_closest_color(self, pix):
         color = [ImageColor.getrgb(color) for color in self.color_set_hex]
@@ -177,7 +203,7 @@ class GUI:
                 closest_color = clr
         return closest_color
 
-    def upload(self):
+    def upload_img(self):
         self.upload_filename = filedialog.askopenfilename(title="original")
         src = cv2.imread(self.upload_filename)
         h,w,c = src.shape
