@@ -5,7 +5,7 @@ import time
 
 def send():
     dev = [info.device for info in list_ports.comports()]
-    filename = '' # set your path here
+    filename = 'emoji_test/pix_art_gui.txt' # set your path here
     if filename == '':
         filename = input('Enter the path to the file: ')
     cnt = 0
@@ -21,10 +21,11 @@ def send():
         while l:
             num += l.strip()
             l = f.readline()
-    ser.write(bytes(num[0,61], 'utf-8'))
-    ser.write(bytes('\n', 'utf-8'))
-    time.sleep(5)
-    ser.write(bytes(num[61:121], 'utf-8'))
+    time.sleep(2)
+    ser.write(bytes(num[0:25], 'utf-8'))
+    print('sent')
+    # time.sleep(5)
+    # ser.write(bytes(num[61:121], 'utf-8'))
     time.sleep(0.05)
 
     while True:

@@ -241,3 +241,6 @@ if __name__ == '__main__':
 # idealized final version and what we have right now
 # combine ok and run
 # GUI like lite brite??
+
+
+# add button to add more than 1 image to show
