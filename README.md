@@ -14,4 +14,12 @@ $ python3 droplets_gui.py YourIPAdress
 2. Choose the right port under Tools
 3. Upload the code to the board
 
+### HTML GUI
+````
+$ cd drop2image
+$ pip install -r requirements.txt
+$ cd main
+$ python3 main.py
+````
+
 # droplets
