@@ -31,9 +31,30 @@ pixs.onclick = function(evt){
   }
 };
 
-document.getElementById("fetch").addEventListener("click", ()=>{eel.fetch()}, false);
+document.getElementById("save").addEventListener("click", function() {
+  html2canvas(document.body).then(function(canvas) {
+    var screenshot = canvas.toDataURL("image/png");
+    var link = document.createElement('a');
+    link.download = 'screenshot.png';
+    link.href = screenshot;
+    link.click();
+  });
+});
+
+let cv = require('./opencv.js')
+
+document.getElementById("fetch").addEventListener("change", function(){
+  let upload_file = document.getElementById("uploaded_image").files[0];
+});
+
+// document.getElementById("fetch").addEventListener("click", ()=>{eel.fetch()}, false);
+// document.getElementById("fetch").onclick = ()=>
+
+// document.getElementById("")
 
 // black with white outline
 // button smaller
 // dark mode
 // mouse down and mouse click might help do the click and drag coloring
+// dynamically changing dimention
+// title
