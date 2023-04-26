@@ -741,10 +741,35 @@
         imgElement.src = URL.createObjectURL(e.target.files[0]);
         }, false);
 
+        function get_closest_color(pix){
+            let closest_color;
+            let min_diff = 100000;
+            let color_set = {"black": [0,0,0], "blue": [0,0,255], "red": [255,0,0], "green": [0,128,0], "yellow": [255,255,0], "pink": [255,192,203], "cyan": [0,255,255], "white":[255,255,255]};
+            for (let color in color_set){
+                let diff = 0;
+                for (let i=0; i<color_set[color].length; i++){
+                    diff = diff + Math.pow(color_set[color][i]-pix[i], 2);
+                }
+                diff = Math.sqrt(diff);
+                if (diff < min_diff){
+                    min_diff = diff;
+                    closest_color = color;
+                }
+            }
+            console.log(closest_color);
+            return closest_color;
+        }
+
         imgElement.onload = function(){
             let src = cv.imread(imgElement);
-            cv.imshow("imageCanvas", src);
+            let dst = new cv.Mat();
+            let dsize = new cv.Size(50, 50);
+            cv.resize(src, dst, dsize, 0, 0, cv.INTER_AREA);
+            cv.imshow("imageCanvas", dst);
+            let color_name = get_closest_color([240,230,230]);
+            console.log(color_name);
             src.delete();
+            dst.delete();
         };
 
         var Module = {
