@@ -41,11 +41,27 @@ document.getElementById("save").addEventListener("click", function() {
   });
 });
 
-let cv = require('./opencv.js')
+let cv = require('opencv.js');
 
-document.getElementById("fetch").addEventListener("change", function(){
-  let upload_file = document.getElementById("uploaded_image").files[0];
-});
+let imgElement = document.getElementById("img_src");
+let inputElement = document.getElementById("file_src");
+
+inputElement.addEventListener("change", (e)=> {
+imgElement.src = URL.createObjectURL(e.target.files[0]);
+}, false);
+
+imgElement.onload = function(){
+    let src = cv.imread(imgElement);
+    cv.imshow("imageCanvas", src);
+    src.delete();
+};
+
+var Module = {
+// https://emscripten.org/docs/api_reference/module.html#Module.onRuntimeInitialized
+onRuntimeInitialized() {
+    document.getElementById('status').innerHTML = 'OpenCV.js is ready.';
+}
+};
 
 // document.getElementById("fetch").addEventListener("click", ()=>{eel.fetch()}, false);
 // document.getElementById("fetch").onclick = ()=>
