@@ -3,6 +3,7 @@
 ## Table of Contents
 1. [Features Summary](#features)
 2. [Requirements](#requirements)
+3. [Installation Instruction](#installation)
 3. [How to Use](#how-to-use)
 
 <a name="features"></a>
@@ -27,6 +28,11 @@ This software is designed to take an image (that was drawn or uploaded on GUI), 
   - USB Type Mini-B for Arduino Nano
   - USB Type A Male for Arduino Uno
   - USB Type Micro-C for ESP32
+
+<a name="installation"></a>
+## Installation Instruction
+### Arduino
+### Software
 
 
 <a name="how_to_use"></a>
@@ -84,7 +90,7 @@ $ python3 pixel_art_gui.py
 
   ![serial_monitor](/img/Screen%20Shot%202023-04-28%20at%206.31.20.png)
 
-### Local Website Version
+### Local Webpage Version
 1. Follow the same step up to step 3 in Python Version
 2. Install required libraries and Run the program
 ````
