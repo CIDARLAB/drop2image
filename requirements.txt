@@ -1,0 +1,23 @@
+altgraph==0.17.2
+bottle==0.12.23
+bottle-websocket==0.2.9
+certifi @ file:///private/var/folders/sy/f16zz6x50xz3113nwtb9bvq00000gp/T/abs_83242e7e-f82d-4a71-8ef2-9d71d212d249gu_wxmeq/croots/recipe/certifi_1655968827803/work/certifi
+colour==0.1.5
+Eel==0.15.0
+future==0.18.2
+gevent==22.10.2
+gevent-websocket==0.10.1
+greenlet==2.0.1
+macholib==1.16
+numpy==1.23.1
+opencv-python==4.6.0.66
+Pillow==9.2.0
+pyinstaller @ https://github.com/pyinstaller/pyinstaller/archive/develop.zip
+pyinstaller-hooks-contrib==2022.8
+pyparsing==3.0.9
+pyserial==3.5
+pySerialTransfer==2.1.7
+tkmacosx==1.0.5
+whichcraft==0.6.1
+zope.event==4.5.0
+zope.interface==5.5.2

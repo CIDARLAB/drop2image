@@ -1,6 +1,9 @@
 import string
 import tkinter
+import string
+import tkinter
 from tkinter import *
+from tkinter import colorchooser
 from PIL import Image
 from PIL import ImageTk
 from PIL import ImageColor
@@ -13,7 +16,14 @@ import time
 import http.server
 import threading
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
+import os
+import time
+import http.server
+import threading
+from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 import socket
+import serial
+from serial.tools import list_ports
 
 class MyServer(threading.Thread):
     def __init__(self, IP_ADDR):
@@ -28,7 +38,9 @@ class MyServer(threading.Thread):
 class GUI:
     def __init__(self):
         self.ip_addr = socket.gethostbyname(socket.gethostname())
+        self.ip_addr = socket.gethostbyname(socket.gethostname())
         self.filename = None
+        self.directory = None
         self.directory = None
         self.filename_closest = None
         self.filename_txt = None
@@ -42,7 +54,10 @@ class GUI:
 
         self.root.title("Image Loader")
         self.root.geometry("750x1000")
+        self.root.geometry("750x1000")
         self.root.resizable(width = True, height = True)
+        self.root.configure(bg='white')
+        self.root.configure(bg='white')
 
         main_btn = Button(self.root, text = 'open image', command=lambda: self.open_img()).grid(row = 1)
         #main_btn = Button(self.root, text = 'open image', command=lambda: self.open_img()).place(x = 0, y =250)
@@ -68,11 +83,20 @@ class GUI:
         set_size_btn = Button(self.root, text = 'OK', command=lambda: self.set_size(width, height, color)).grid(row = 6)
         #set_size_btn = Button(self.root, text = 'OK', command=lambda: self.set_size(width, height, color)).place(x = 200, y = 300)
 
-        run_btn = Button(self.root, text = 'run', command = lambda: self.transformation(self.image_size, color)).grid(row = 9)
+        run_btn = Button(self.root, text = 'run', command = lambda: self.transformation(self.image_size, color)).grid(row = 8)
+        run_btn = Button(self.root, text = 'run', command = lambda: self.transformation(self.image_size, color)).grid(row = 8)
         #run_btn = Button(self.root, text = 'run', command = lambda: self.transformation(self.image_size, color)).place(x = 200, y = 325)
 
-        send_btn = Button(self.root, text = 'send to Arduino', command = lambda: self.send_to_Arduino()).grid(row = 10)
-        #send_btn = Button(self.root, text = 'send to Arduino', command = lambda: self.send_to_Arduino()).place(x = 0, y = 605)
+        dev = [info.device for info in list_ports.comports()]
+        self.port = StringVar()
+        select_box = ttk.Combobox(self.root, textvariable=self.port, values=dev, style='office.TCombobox').grid(row = 9)
+
+        send_btn = Button(self.root, text = 'send to Arduino', command = lambda: self.Serial_Com()).grid(row = 9)
+
+        send_btn = Button(self.root, text = 'send to Arduino', command = lambda: self.Serial_Com()).grid(row = 10)
+
+        # send_btn = Button(self.root, text = 'send to Arduino', command = lambda: self.send_to_Arduino()).grid(row = 10)
+        # send_btn = Button(self.root, text = 'send to Arduino', command = lambda: self.send_to_Arduino()).place(x = 0, y = 605)
 
         frame = ttk.Frame(self.root).grid()
         ip_txt = ttk.Entry(frame, width = 30)
@@ -93,7 +117,7 @@ class GUI:
         # open the image and display
         img = Image.open(self.filename)
         self.src = img
-        img = img.resize((250, 250), Image.Resampling.LANCZOS)
+        img = img.resize((200, 200), Image.Resampling.LANCZOS)
 
         # PhotoImage class is used to add image to widgets, icons etc
         img = ImageTk.PhotoImage(img)
@@ -103,6 +127,7 @@ class GUI:
 
         # set the image as img
         panel.image = img
+        panel.grid(row = 1)
         panel.grid(row = 1)
 
     def openfilename(self):
@@ -116,7 +141,8 @@ class GUI:
         panel = Label(self.root, image = resized_img)
         panel.image = resized_img
         panel.grid(row = 7, column = 0)
-        #panel.place(x = 0, y = 350)
+        # panel.place(x = 0, y = 350, column = 0)
+        # panel.place(x = 0, y = 350)
         cv2_closest_resized_img = self.get_closest_image(self.src_cv2, self.color_set)
         closest_resized_img = Image.open(self.filename_closest)
         closest_resized_img = closest_resized_img.resize((250, 250), Image.Resampling.LANCZOS)
@@ -124,7 +150,9 @@ class GUI:
         panel2 = Label(self.root, image = closest_resized_img)
         panel2.image = closest_resized_img
         panel2.grid(row = 7, column = 1)
-        #panel2.place(x = 300, y = 350)
+        # panel2.place(x = 300, y = 350)
+        panel2.grid(row = 7, column = 1)
+        # panel2.place(x = 300, y = 350)
         self.convert_jpeg_to_pix(self.filename_closest, self.color_set)
         self.output_format(self.pix_list)
 
@@ -154,6 +182,21 @@ class GUI:
         time.sleep(30)
         s.stop()
         print('thread alive:', s.is_alive())  # False
+
+    def Serial_Com(self):
+        ser = serial.Serial(self.port.get(), 9600)
+        print(self.filename_txt)
+        f = open(self.filename_txt, 'r', encoding='utf_8')
+        while True:
+            line = f.readline()
+            if line:
+                ser.write(line.encode('utf-8'))
+                time.sleep(0.5)
+                time.sleep(0.5)
+            else:
+                ser.close()
+                break
+        f.close()
 
     def get_closest_color(self, pix, color):
         closest_color = None
@@ -191,6 +234,7 @@ class GUI:
         im = im.convert('RGB')
         color_set_rgb = [ImageColor.getrgb(color) for color in color_set]
         self.pix_list.clear()
+        self.pix_list.clear()
         if w%2==0:
             for i in range(h):
                 for j in range(w):
@@ -219,12 +263,22 @@ class GUI:
         self.directory = path
         self.filename_txt = self.directory + 'pix.txt'
         txt = open(self.filename_txt, 'w').close()
+        file = self.filename.split('/')
+        path = ''
+        for dr in file:
+            if '.' in dr:
+                continue
+            else:
+                path += dr + '/'
+        self.directory = path
+        self.filename_txt = self.directory + 'pix.txt'
+        txt = open(self.filename_txt, 'w').close()
         txt = open(self.filename_txt, 'a')
         np.savetxt(self.filename_txt, pix, fmt='%d', delimiter=" ")
         txt.close()
         return
 
-    # def dispaly_ip(self):
+            # def dispaly_ip(self):
     #     self.ip_txt.insert(END, "http://" + self.ip_addr + ":8888/pix.txt")
 
 # def main(IP_ADDR):
@@ -233,11 +287,39 @@ class GUI:
 # if __name__ == '__main__':
 #     main(sys.argv[1] if len(sys.argv) > 1 else "")
 
-test = GUI()
+if __name__ == '__main__':
+    test = GUI()
 
 #need to implement menu tab
 #need to implement select menu for serial port -> done
 
+# README first -> instructions
+# repo name: drop to image
+
+# add title, background, centered
+# making small changes to make sure mirror worked
+
+##
+# color wheel
+# Entry box to IP Address
+# link to image
+# link to files
+# fix sets of images
+
+##
+# pictures from David to make it more clear w/ OpenCV
+# compare the original image and one from Arduino
+# photoshop filter
+# % of match, which one is wrong
+# frame shift or one drop
+
+# picture of flow
+# idealized final version and what we have right now
+# combine ok and run
+# GUI like lite brite??
+
+
+# add button to add more than 1 image to show
 
 # README first -> instructions
 # repo name: drop to image
