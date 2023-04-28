@@ -2603,15 +2603,15 @@
             <img id="img_src" alt="No Image" hidden/>
         </div>
         <div class="I/O">
-            <canvas id="imageCanvas"></canvas>
+            <canvas id="imageCanvas" hidden></canvas>
             <div class="caption">imageCanvas</div>
-            <canvas id="resized_image"></canvas>
-            <div class="caption">resized_image</div>
+            <img id="resize_img" alt="No Image" hidden>
         </div>
     </div>
     <script type="text/javascript">
         let imgElement = document.getElementById("img_src");
         let inputElement = document.getElementById("file_src");
+        let resized_imgElement = document.getElementById("resize_img");
 
         inputElement.addEventListener("change", (e)=> {
             imgElement.src = URL.createObjectURL(e.target.files[0]);
@@ -2641,7 +2641,6 @@
             let dsize = new cv.Size(50, 50);
             cv.resize(src, dst, dsize, 0, 0, cv.INTER_AREA);
             cv.imshow("imageCanvas", dst);
-            cv.imshow("imageCanvas", src);
 
             let img = document.getElementById("img_src");
             let canvas = document.getElementById('imageCanvas');
@@ -2654,9 +2653,26 @@
                 }
             }
 
+            // let resized_img = document.getElementById("resized_img");
+            // let resized_canvas = document.createElement("canvas");
+            // let resized_con
             src.delete();
             dst.delete();
         };
+
+        // resized_imgElement.onload = function(){
+        //     let img = document.getElementById("img_src");
+        //     let canvas = document.getElementById('imageCanvas');
+        //     let ctx = canvas.getContext('2d');
+        //     let imageData = ctx.getImageData(0, 0, img.width, img.height);
+        //     let pixs = document.getElementById("pixs");
+        //     for (let i=0, row; row=pixs.rows[i]; i++){
+        //         for (let j=0, cell; cell=row.cells[j]; j++){
+        //             cell.style.backgroundColor = get_closest_color([imageData.data[j*4+200*i], imageData.data[j*4+200*i+1], imageData.data[j*4+200*i+2] ]);
+        //         }
+        //     }
+        //     console.log("resized")
+        // };
 
         var Module = {
         // https://emscripten.org/docs/api_reference/module.html#Module.onRuntimeInitialized
