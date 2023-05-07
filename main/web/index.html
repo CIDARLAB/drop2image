@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="css/main.css">
     <script type="text/javascript" src="/eel.js"></script> 
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <?php include 'php/main.php'; ?>
 </head>
 <!-- <body>
     <div class="topnav">
@@ -2599,7 +2600,7 @@
     <div>
         <div class="I/O">
             <input type="file" id="file_src" name="file" hidden/>
-            <label for="file_src">Upload Image</label>
+            <label for="file_src" id="file_label">Upload Image</label>
             <img id="img_src" alt="No Image" hidden/>
         </div>
         <div class="I/O">
@@ -2689,6 +2690,20 @@
         <input type="file" id="file_src"hidden/>
         <label for="file_src">Upload Image</label> -->
         <button id="save">Save Image</button>
+        <details>
+            <summary id="Parameters">Parameters</summary>
+                <details>
+                    <summary id="size">Grid Size</summary>
+                    <br><input type="text" id="row" name="row" value="50">
+                    <label> x </label>
+                    <input type="text" id="col" name="col" value="50"><br>
+                </details>
+                <details>
+                    <summary id="add_color">Add Color</summary>
+                    <br><input type="color" id="favcolor" name="favcolor" value="#000000">
+                    <input type="submit" value="Add" id="add"><br>
+                </details>
+        </details> 
     </div>
 </body>
 
