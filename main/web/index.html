@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="css/main.css">
     <script type="text/javascript" src="/eel.js"></script> 
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <?php include 'php/main.php'; ?>
 </head>
 <!-- <body>
@@ -18,13 +19,6 @@
         <a id="button-ip">Display my ip</a>
       </div> 
 </body> -->
-<nav>
-    <ul>
-        <li><a href="#">Save</a></li>
-        <li><a href="#">Upload</a></li>
-        <li><a href="#">Setting</a></li>
-    </ul>
-</nav>
 
 <body style="background-color: black;">
     <div class="top">
@@ -2694,13 +2688,16 @@
             <summary id="Parameters">Parameters</summary>
                 <details>
                     <summary id="size">Grid Size</summary>
-                    <br><input type="text" id="row" name="row" value="50">
+                    <br>
+                    <input type="text" id="row" name="row" value="50">
                     <label> x </label>
-                    <input type="text" id="col" name="col" value="50"><br>
+                    <input type="text" id="col" name="col" value="50">
+                    <button id="update">Update</button>
+                    <br>
                 </details>
                 <details>
                     <summary id="add_color">Add Color</summary>
-                    <br><input type="color" id="favcolor" name="favcolor" value="#000000">
+                    <br><input type="color" id="newcolor" name="newcolor" value="#000000">
                     <input type="submit" value="Add" id="add"><br>
                 </details>
         </details> 
