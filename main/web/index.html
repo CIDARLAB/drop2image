@@ -2587,6 +2587,58 @@
                 <td></td>
                 <td></td>
             </tr>
+            <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
         </table>
     </div>
 </body>
@@ -2633,7 +2685,11 @@
         imgElement.onload = function(){
             let src = cv.imread(imgElement);
             let dst = new cv.Mat();
-            let dsize = new cv.Size(50, 50);
+            let row_cnt = $("#pixs tr").length; 
+            let col_cnt = $("#pixs tr td").length/row_cnt;
+            console.log(row_cnt);
+            console.log(col_cnt);
+            let dsize = new cv.Size(row_cnt, row_cnt);
             cv.resize(src, dst, dsize, 0, 0, cv.INTER_AREA);
             cv.imshow("imageCanvas", dst);
 
@@ -2642,32 +2698,22 @@
             let ctx = canvas.getContext('2d');
             let imageData = ctx.getImageData(0, 0, img.width, img.height);
             let pixs = document.getElementById("pixs");
+
+            let resizedImageData = new ImageData(col_cnt, row_cnt);
+            ctx.drawImage(img, 0, 0, col_cnt, row_cnt);
+            resizedImageData = ctx.getImageData(0, 0, col_cnt, row_cnt);
+            console.log(resizedImageData);
+
             for (let i=0, row; row=pixs.rows[i]; i++){
                 for (let j=0, cell; cell=row.cells[j]; j++){
-                    cell.style.backgroundColor = get_closest_color([imageData.data[j*4+200*i], imageData.data[j*4+200*i+1], imageData.data[j*4+200*i+2] ]);
+                    cell.style.backgroundColor = get_closest_color([resizedImageData.data[j*4+row_cnt*4*i], resizedImageData.data[j*4+row_cnt*4*i+1], resizedImageData.data[j*4+row_cnt*4*i+2] ]);
                 }
             }
 
-            // let resized_img = document.getElementById("resized_img");
-            // let resized_canvas = document.createElement("canvas");
-            // let resized_con
             src.delete();
             dst.delete();
         };
 
-        // resized_imgElement.onload = function(){
-        //     let img = document.getElementById("img_src");
-        //     let canvas = document.getElementById('imageCanvas');
-        //     let ctx = canvas.getContext('2d');
-        //     let imageData = ctx.getImageData(0, 0, img.width, img.height);
-        //     let pixs = document.getElementById("pixs");
-        //     for (let i=0, row; row=pixs.rows[i]; i++){
-        //         for (let j=0, cell; cell=row.cells[j]; j++){
-        //             cell.style.backgroundColor = get_closest_color([imageData.data[j*4+200*i], imageData.data[j*4+200*i+1], imageData.data[j*4+200*i+2] ]);
-        //         }
-        //     }
-        //     console.log("resized")
-        // };
 
         var Module = {
         // https://emscripten.org/docs/api_reference/module.html#Module.onRuntimeInitialized

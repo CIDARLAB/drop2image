@@ -46,6 +46,8 @@ $(document).ready(function(){
   });
 });
 
+
+
 // document.getElementById("fetch").addEventListener("click", ()=>{eel.fetch()}, false);
 // document.getElementById("fetch").onclick = ()=>
 
