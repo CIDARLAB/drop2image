@@ -38,21 +38,21 @@
     margin: auto;
   }
   #black{background-color: black;}
-  #black:hover {background-color: gray;}
+  /* #black:hover {background-color: gray;}  */
   #blue{background-color: blue;}
-  #blue:hover{background-color: lightblue;}
+  /* #blue:hover{background-color: lightblue;} */
   #red{background-color: red;}
-  #red:hover{background-color: lightcoral;}
+  /* #red:hover{background-color: lightcoral;} */
   #green{background-color: green;}
-  #green:hover{background-color: lightgreen;}
+  /* #green:hover{background-color: lightgreen;} */
   #yellow{background-color: yellow;}
-  #yellow:hover{background-color: lightyellow;}
+  /* #yellow:hover{background-color: lightyellow;} */
   #pink{background-color: pink;}
-  #pink:hover{background-color: rgb(209, 174, 180);}
+  /* #pink:hover{background-color: rgb(209, 174, 180);} */
   #cyan{background-color: cyan;}
-  #cyan:hover{background-color: lightcyan;}
+  /* #cyan:hover{background-color: lightcyan;} */
   #white{background-color: white;}
-  #white:hover{background-color: rgb(226, 229, 229);}
+  /* #white:hover{background-color: rgb(226, 229, 229);} */
 
   table.pixs{
     border: 1px solid;
@@ -106,13 +106,29 @@
 
   #row{
     margin-left: 40px;
+    width: 25px;
+  }
+
+  #col{
+    width: 25px;
+  }
+
+  #update{
+    background-color: black;
+    color: white;
+    text-align: center;
+    margin: 10px;
+    border: 2px solid gray;
+    font-size: 16px;
+    font-family: 'Times New Roman', Times, serif;
+    margin-left: 10px;
   }
 
   #add_color{
     margin-left: 30px;
   }
 
-  #favcolor{
+  #newcolor{
     margin-left: 40px;
 
   }

@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="css/main.css">
     <script type="text/javascript" src="/eel.js"></script> 
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <?php include 'php/main.php'; ?>
 </head>
 <!-- <body>
@@ -18,13 +19,6 @@
         <a id="button-ip">Display my ip</a>
       </div> 
 </body> -->
-<nav>
-    <ul>
-        <li><a href="#">Save</a></li>
-        <li><a href="#">Upload</a></li>
-        <li><a href="#">Setting</a></li>
-    </ul>
-</nav>
 
 <body style="background-color: black;">
     <div class="top">
@@ -45,6 +39,58 @@
 <body>
     <div class="middle">
         <table class="pixs" id="pixs">
+            <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
             <tr>
                 <td></td>
                 <td></td>
@@ -2639,7 +2685,11 @@
         imgElement.onload = function(){
             let src = cv.imread(imgElement);
             let dst = new cv.Mat();
-            let dsize = new cv.Size(50, 50);
+            let row_cnt = $("#pixs tr").length; 
+            let col_cnt = $("#pixs tr td").length/row_cnt;
+            console.log(row_cnt);
+            console.log(col_cnt);
+            let dsize = new cv.Size(row_cnt, row_cnt);
             cv.resize(src, dst, dsize, 0, 0, cv.INTER_AREA);
             cv.imshow("imageCanvas", dst);
 
@@ -2648,32 +2698,22 @@
             let ctx = canvas.getContext('2d');
             let imageData = ctx.getImageData(0, 0, img.width, img.height);
             let pixs = document.getElementById("pixs");
+
+            let resizedImageData = new ImageData(col_cnt, row_cnt);
+            ctx.drawImage(img, 0, 0, col_cnt, row_cnt);
+            resizedImageData = ctx.getImageData(0, 0, col_cnt, row_cnt);
+            console.log(resizedImageData);
+
             for (let i=0, row; row=pixs.rows[i]; i++){
                 for (let j=0, cell; cell=row.cells[j]; j++){
-                    cell.style.backgroundColor = get_closest_color([imageData.data[j*4+200*i], imageData.data[j*4+200*i+1], imageData.data[j*4+200*i+2] ]);
+                    cell.style.backgroundColor = get_closest_color([resizedImageData.data[j*4+row_cnt*4*i], resizedImageData.data[j*4+row_cnt*4*i+1], resizedImageData.data[j*4+row_cnt*4*i+2] ]);
                 }
             }
 
-            // let resized_img = document.getElementById("resized_img");
-            // let resized_canvas = document.createElement("canvas");
-            // let resized_con
             src.delete();
             dst.delete();
         };
 
-        // resized_imgElement.onload = function(){
-        //     let img = document.getElementById("img_src");
-        //     let canvas = document.getElementById('imageCanvas');
-        //     let ctx = canvas.getContext('2d');
-        //     let imageData = ctx.getImageData(0, 0, img.width, img.height);
-        //     let pixs = document.getElementById("pixs");
-        //     for (let i=0, row; row=pixs.rows[i]; i++){
-        //         for (let j=0, cell; cell=row.cells[j]; j++){
-        //             cell.style.backgroundColor = get_closest_color([imageData.data[j*4+200*i], imageData.data[j*4+200*i+1], imageData.data[j*4+200*i+2] ]);
-        //         }
-        //     }
-        //     console.log("resized")
-        // };
 
         var Module = {
         // https://emscripten.org/docs/api_reference/module.html#Module.onRuntimeInitialized
@@ -2694,13 +2734,16 @@
             <summary id="Parameters">Parameters</summary>
                 <details>
                     <summary id="size">Grid Size</summary>
-                    <br><input type="text" id="row" name="row" value="50">
+                    <br>
+                    <input type="text" id="row" name="row" value="50">
                     <label> x </label>
-                    <input type="text" id="col" name="col" value="50"><br>
+                    <input type="text" id="col" name="col" value="50">
+                    <button id="update">Update</button>
+                    <br>
                 </details>
                 <details>
                     <summary id="add_color">Add Color</summary>
-                    <br><input type="color" id="favcolor" name="favcolor" value="#000000">
+                    <br><input type="color" id="newcolor" name="newcolor" value="#000000">
                     <input type="submit" value="Add" id="add"><br>
                 </details>
         </details> 

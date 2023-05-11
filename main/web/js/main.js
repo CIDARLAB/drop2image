@@ -1,35 +1,14 @@
-document.getElementById("black").onclick = function(){
-  document.querySelector(":root").style.setProperty('--current-color', 'black')
-};
-document.getElementById("blue").onclick = function(){
-  document.querySelector(":root").style.setProperty('--current-color', 'blue')
-};
-document.getElementById("red").onclick = function(){
-  document.querySelector(":root").style.setProperty('--current-color', 'red')
-};
-document.getElementById("green").onclick = function(){
-  document.querySelector(":root").style.setProperty('--current-color', 'green')
-};
-document.getElementById("yellow").onclick = function(){
-  document.querySelector(":root").style.setProperty('--current-color', 'yellow')
-};
-document.getElementById("pink").onclick = function(){
-  document.querySelector(":root").style.setProperty('--current-color', 'pink')
-};
-document.getElementById("cyan").onclick = function(){
-  document.querySelector(":root").style.setProperty('--current-color', 'cyan')
-};
-document.getElementById("white").onclick = function(){
-  document.querySelector(":root").style.setProperty('--current-color', 'white')
-};
+$(document).ready(function() {
+  $('#colors td').click(function() {
+    var color = $(this).css('background-color');
+    $(':root').css('--current-color', color);
+    console.log(color)
+  });
+});
 
-var pixs = document.getElementById("pixs");
-pixs.onclick = function(evt){
-  var target = evt.target || event.srcElement;
-  if ((target.tagName || "").match(/td/i)){
-    target.style.backgroundColor = getComputedStyle(document.querySelector(':root')).getPropertyValue('--current-color');
-  }
-};
+$('#pixs').on('click', 'td', function() {
+  $(this).css('background-color', $(':root').css('--current-color'));
+});
 
 document.getElementById("save").addEventListener("click", function() {
   html2canvas(document.body).then(function(canvas) {
@@ -38,6 +17,32 @@ document.getElementById("save").addEventListener("click", function() {
     link.download = 'screenshot.png';
     link.href = screenshot;
     link.click();
+  });
+});
+
+$(document).ready(function(){
+  $('#update').click(function(){
+    var num_cols = $('#col').val();
+    var num_rows = $('#row').val();
+    var table_rows = $('#pixs tr');
+
+    table_rows.remove();
+
+    for (var i=0; i<num_rows; i++){
+      var new_row = $('<tr>');
+      for (var j=0; j<num_cols; j++){
+        new_row.append('<td></td>');
+      }
+      $('#pixs').append(new_row);
+    }
+  });
+});
+
+$(document).ready(function(){
+  $('#add').click(function(){
+    var selected_color = $('#newcolor').val();
+    var new_cell = $('<td></td>').css('background-color', selected_color);
+    $('#colors tr:last-child').append(new_cell);
   });
 });
 
